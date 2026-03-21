@@ -276,10 +276,16 @@ function fmtDur(min){if(min>=60){const h=Math.floor(min/60);const m=min%60;retur
 function fmtTime(t){const[h,m]=t.split(":");const hr=parseInt(h);const ap=hr>=12&&hr<24?"PM":"AM";const d=hr===0?12:hr>12?hr-12:hr;return`${d}:${m} ${ap}`}
 function getNowMin(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));return s.getHours()*60+s.getMinutes()}
 function getSantiagoDate(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));return`${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}-${String(s.getDate()).padStart(2,"0")}`}
+/* Before 4AM, we're still "in" the previous day's schedule since all days run until ~3AM */
+function getScheduleDate(){
+  const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));
+  if(s.getHours()<4){s.setDate(s.getDate()-1)}
+  return`${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}-${String(s.getDate()).padStart(2,"0")}`
+}
 function getClockStr(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));const h=String(s.getHours()).padStart(2,"0");const m=String(s.getMinutes()).padStart(2,"0");return`${h}:${m}`}
 
 function App(){
-  const[sel,setSel]=useState(()=>{const t=getSantiagoDate();const i=DAYS.findIndex(d=>d.date===t);return i>=0?i:0});
+  const[sel,setSel]=useState(()=>{const t=getScheduleDate();const i=DAYS.findIndex(d=>d.date===t);return i>=0?i:0});
   const[now,setNow]=useState(getNowMin);
   const[clock,setClock]=useState(getClockStr);
   const curRef=useRef(null);
@@ -288,25 +294,31 @@ function App(){
   useEffect(()=>{if(curRef.current)curRef.current.scrollIntoView({behavior:"smooth",block:"center"})},[sel]);
 
   const day=DAYS[sel];
-  const isToday=day.date===getSantiagoDate();
+  /* A day's schedule is "active" if: it's the schedule date (accounting for overnight) */
+  const isActive=day.date===getScheduleDate();
 
   const currentBlock=useMemo(()=>{
-    if(!isToday)return-1;
+    if(!isActive)return-1;
+    /* now is 0-1439 (real clock minutes). For overnight blocks (start > end),
+       we add 1440 to both end and now-if-small to compare correctly.
+       Key fix: only match overnight blocks (start > 720) when now < 240 (before 4AM),
+       meaning we're in the tail end. Don't match them when now > 720 (afternoon). */
     for(let i=0;i<day.blocks.length;i++){
       const b=day.blocks[i];
       let sA=t2m(b.s),eA=t2m(b.e);
-      if(eA<=sA)eA+=1440;
+      const isOvernight=eA<=sA;
+      if(isOvernight)eA+=1440;
       let nA=now;
-      if(nA<sA&&sA>720)nA+=1440;
+      if(isOvernight&&nA<sA)nA+=1440;
       if(nA>=sA&&nA<eA)return i;
     }
     return-1;
-  },[day,now,isToday]);
+  },[day,now,isActive]);
 
   const getRemaining=useCallback((b)=>{
-    let e=t2m(b.e),n=now;
-    if(e<=t2m(b.s))e+=1440;
-    if(n<t2m(b.s)&&t2m(b.s)>720)n+=1440;
+    let e=t2m(b.e),s=t2m(b.s),n=now;
+    if(e<=s)e+=1440;
+    if(n<s)n+=1440;
     return Math.max(0,e-n);
   },[now]);
 
@@ -318,7 +330,7 @@ function App(){
           {DAYS.map((d,i)=>{
             const dn=new Date(d.date+"T12:00:00").getDate();
             const isSel=i===sel;
-            const isT=d.date===getSantiagoDate();
+            const isT=d.date===getScheduleDate();
             const isExam=d.sum.includes("CONTROL")||d.sum.includes("Solemne");
             return(
               <button key={i} onClick={()=>setSel(i)} style={{
@@ -338,7 +350,7 @@ function App(){
             <div style={{fontSize:13,color:"#999",fontWeight:500}}>{day.wd}</div>
             <div style={{fontSize:22,fontWeight:700}}>{day.label}</div>
           </div>
-          {isToday&&<div style={{fontSize:28,fontWeight:300,fontVariantNumeric:"tabular-nums"}}>{clock}</div>}
+          {isActive&&<div style={{fontSize:28,fontWeight:300,fontVariantNumeric:"tabular-nums"}}>{clock}</div>}
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:4,marginBottom:10}}>
           {day.alerts.map((a,i)=>(
@@ -356,7 +368,7 @@ function App(){
           const sub=SUB[b.sub];
           const d=dur(b.s,b.e);
           const isCur=i===currentBlock;
-          const isPast=isToday&&!isCur&&currentBlock>i;
+          const isPast=isActive&&!isCur&&currentBlock>i;
           const rem=isCur?getRemaining(b):0;
           let gap=0;
           if(i>0){const pe=t2m(day.blocks[i-1].e);const ts=t2m(b.s);gap=ts-pe;if(gap<0)gap+=1440}
