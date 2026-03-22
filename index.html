@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Plan Académico — Lucía</title>
+<title>Plan Académico v5 — Lucía</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#faf9f7; color:#1a1a1a; }
-  ::-webkit-scrollbar { width:4px; height:4px; }
-  ::-webkit-scrollbar-thumb { background:rgba(0,0,0,.12); border-radius:4px; }
-  button { font-family:inherit; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#faf9f7;color:#1a1a1a}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:4px}
+  button{font-family:inherit}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -19,72 +19,54 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useRef, useMemo, useCallback } = React;
+const{useState,useEffect,useRef,useMemo,useCallback}=React;
 
-const SUB = {
-  delitos:    { label:"Delitos de Corrupción", color:"#e74c3c", bg:"#fdecea", icon:"⚖️" },
-  vocacion:   { label:"Vocación Judicial",     color:"#27ae60", bg:"#e8f8ef", icon:"🏛️" },
-  concursos:  { label:"Concursos Comercial",   color:"#f39c12", bg:"#fef5e7", icon:"📋" },
-  etica:      { label:"Ética Profesional",     color:"#2980b9", bg:"#ebf5fb", icon:"📘" },
-  admin:      { label:"Derecho Administrativo",color:"#8e44ad", bg:"#f4ecf7", icon:"📑" },
-  selfcare:   { label:"Self-care / Yoga",      color:"#e84393", bg:"#fce4ec", icon:"🌸" },
-  clase:      { label:"Clase",                 color:"#7f8c8d", bg:"#f2f3f4", icon:"🎓" },
-  transporte: { label:"Transporte",            color:"#95a5a6", bg:"#f2f4f4", icon:"🚌" },
-  evento:     { label:"Evento",                color:"#e67e22", bg:"#fef0e4", icon:"📌" },
+const SUB={
+  delitos:{label:"Delitos de Corrupción",color:"#e74c3c",bg:"#fdecea",icon:"⚖️"},
+  vocacion:{label:"Vocación Judicial",color:"#27ae60",bg:"#e8f8ef",icon:"🏛️"},
+  concursos:{label:"Concursos Comercial",color:"#f39c12",bg:"#fef5e7",icon:"📋"},
+  etica:{label:"Ética Profesional",color:"#2980b9",bg:"#ebf5fb",icon:"📘"},
+  admin:{label:"Derecho Administrativo",color:"#8e44ad",bg:"#f4ecf7",icon:"📑"},
+  selfcare:{label:"Self-care / Yoga",color:"#e84393",bg:"#fce4ec",icon:"🌸"},
+  clase:{label:"Clase",color:"#7f8c8d",bg:"#f2f3f4",icon:"🎓"},
+  transporte:{label:"Transporte",color:"#95a5a6",bg:"#f2f4f4",icon:"🚌"},
 };
 
-const DAYS = [
-{date:"2026-03-20",wd:"Viernes",label:"20 mar",blocks:[
-{s:"15:15",e:"17:00",sub:"selfcare",t:"Siesta",icon:"💤"},
-{s:"17:00",e:"17:15",sub:"selfcare",t:"Despertar, agua",icon:"💧"},
-{s:"17:15",e:"17:45",sub:"selfcare",t:"Yoga — espalda, cuello",icon:"🧘"},
-{s:"17:45",e:"18:00",sub:"selfcare",t:"Snack, té",icon:"☕"},
-{s:"18:00",e:"19:00",sub:"concursos",t:"C-L1 calentar (~8p)",icon:"📋"},
-{s:"19:00",e:"21:30",sub:"concursos",t:"C-L1 terminar (12p)",icon:"📋",peak:true},
-{s:"21:30",e:"22:00",sub:"selfcare",t:"Break, preparar cena",icon:"🍃"},
-{s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"01:00",sub:"delitos",t:"D-L7 — primeras 10-12p",icon:"⚖️"},
-{s:"01:00",e:"02:00",sub:"delitos",t:"D-L7 si hay energía (~3-5p)",icon:"⚖️"},
-{s:"02:00",e:"02:30",sub:"selfcare",t:"Skincare, wind-down",icon:"🌙"},
-],sum:"C-L1 ✓ (20p) | D-L7 avanzar 10-15p",alerts:["📋 Terminar C-L1 (20p) + empezar D-L7"]},
+/*
+ESTADO ACTUAL (dom 22, 15:00):
+Concursos (control mié 25, 5%) — solo L1-L6 + materia 27p:
+  L1(40p): 20p restantes | L2(27p): leída ✓ | L3(23p): 16p restantes
+  L4(21p): 13p restantes (leyendo ahora) | L5(6p): no leída | L6(37p): no leída
+  Materia: 27p no leída → TOTAL PENDIENTE: 119p
 
-{date:"2026-03-21",wd:"Sábado",label:"21 mar",blocks:[
-{s:"02:30",e:"06:45",sub:"selfcare",t:"Dormir (~4h 15min)",icon:"💤"},
-{s:"06:45",e:"07:30",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
-{s:"07:30",e:"10:00",sub:"selfcare",t:"Pilates",icon:"🧘"},
-{s:"10:00",e:"10:30",sub:"selfcare",t:"Volver, snack",icon:"🥤"},
-{s:"10:30",e:"11:30",sub:"selfcare",t:"Siesta (1h)",icon:"💤"},
-{s:"11:30",e:"12:00",sub:"selfcare",t:"Ducha, almuerzo ligero",icon:"🍽️"},
-{s:"12:00",e:"14:30",sub:"concursos",t:"C-L2 (23p)",icon:"📋"},
-{s:"14:30",e:"15:00",sub:"selfcare",t:"Break, snack",icon:"🍃"},
-{s:"15:00",e:"15:30",sub:"concursos",t:"C-L5 (3p) — cerrarla",icon:"📋"},
-{s:"15:30",e:"16:00",sub:"selfcare",t:"Estiramientos (20 min)",icon:"🧘"},
-{s:"16:00",e:"17:00",sub:"concursos",t:"Repaso notas C-L1+L2",icon:"📋"},
-{s:"17:00",e:"18:30",sub:"vocacion",t:"Vocación: primera lectura (~6p)",icon:"🏛️",peak:true},
-{s:"18:30",e:"19:30",sub:"selfcare",t:"Descanso, arreglarse",icon:"✨"},
-{s:"19:30",e:"20:00",sub:"selfcare",t:"Traslado cumpleaños",icon:"🚌"},
-{s:"20:00",e:"02:00",sub:"selfcare",t:"Cumpleaños — disfrútalo",icon:"🎂"},
-],sum:"C-L2 ✓ | C-L5 ✓ | Vocación inicio (~6p)",alerts:["🎂 Cumpleaños 20:00","🏛️ Vocación empieza HOY"]},
+Delitos (control mar 31, 15%):
+  L7(23p): 13p restantes | L8(32p) L9(40p) L10(32p): no leídas
+  L1-L6 ya leídas → repaso 346p
 
+Vocación (solemne mié 1 abr, 30%): 30p materia, sin empezar
+Ética: lectura ~6p para mañana lunes
+Admin: preparar clase para martes 24
+*/
+
+const DAYS=[
+// ===== DOM 22 — EXPRESS ~54p =====
 {date:"2026-03-22",wd:"Domingo",label:"22 mar",blocks:[
-{s:"02:30",e:"11:00",sub:"selfcare",t:"Dormir largo (~8.5h)",icon:"💤"},
-{s:"11:00",e:"11:30",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
-{s:"11:30",e:"12:00",sub:"selfcare",t:"Yoga (30 min)",icon:"🧘"},
-{s:"12:00",e:"14:15",sub:"concursos",t:"C-L3 (21p)",icon:"📋"},
-{s:"14:15",e:"14:45",sub:"selfcare",t:"Almuerzo",icon:"🍽️"},
-{s:"14:45",e:"17:00",sub:"concursos",t:"C-L4 (18p)",icon:"📋"},
-{s:"17:00",e:"17:30",sub:"selfcare",t:"Break: caminar, snack",icon:"🍃"},
-{s:"17:30",e:"18:00",sub:"delitos",t:"D-L7 terminar (~8p)",icon:"⚖️"},
-{s:"18:00",e:"19:00",sub:"etica",t:"Ética lectura ~6p",icon:"📘"},
-{s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación lectura (~8p)",icon:"🏛️",peak:true},
+{s:"15:15",e:"15:30",sub:"selfcare",t:"Prepararse, agua, snack",icon:"💧"},
+{s:"15:30",e:"17:30",sub:"concursos",t:"C-L4 terminar (13p) + C-L5 (6p)",icon:"📋"},
+{s:"17:30",e:"18:00",sub:"selfcare",t:"Yoga — espalda, cuello",icon:"🧘"},
+{s:"18:00",e:"19:00",sub:"concursos",t:"C-L3 terminar (16p — primera hora)",icon:"📋"},
+{s:"19:00",e:"21:30",sub:"delitos",t:"D-L7 terminar (13p)",icon:"⚖️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"01:00",sub:"concursos",t:"Materia de clases (~8p)",icon:"📋"},
-{s:"01:00",e:"01:30",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"🔥 EXPRESS: C-L3 ✓ | C-L4 ✓ | D-L7 ✓ | Ética ✓ | Vocación +8p",alerts:["🔥 EXPRESS ~55p","⚠️ Mañana Corte 7AM"]},
+{s:"22:30",e:"23:00",sub:"etica",t:"Ética lectura ~6p (para mañana)",icon:"📘"},
+{s:"23:00",e:"01:30",sub:"concursos",t:"C-L6 empezar (~12-15p)",icon:"📋"},
+{s:"01:30",e:"02:00",sub:"selfcare",t:"Wind-down (mañana Corte 7AM ⚠️)",icon:"🌙"},
+],sum:"🔥 EXPRESS: C-L4 ✓ | C-L5 ✓ | C-L3 ✓ | D-L7 ✓ | Ética ✓ | C-L6 inicio",
+alerts:["🔥 EXPRESS — último día libre completo","⚠️ Mañana Corte Suprema 7AM","🎯 Cerrar L3, L4, L5 de Concursos + D-L7"]},
 
+// ===== LUN 23 — Corte + C-L6 + Admin =====
 {date:"2026-03-23",wd:"Lunes",label:"23 mar",blocks:[
-{s:"01:30",e:"06:15",sub:"selfcare",t:"Dormir (~4h 45min)",icon:"💤"},
+{s:"02:00",e:"06:15",sub:"selfcare",t:"Dormir (~4h)",icon:"💤"},
 {s:"06:15",e:"07:00",sub:"selfcare",t:"Despertar, desayuno, modafinil",icon:"☀️"},
 {s:"07:00",e:"08:00",sub:"transporte",t:"Traslado a Corte Suprema",icon:"🚌"},
 {s:"08:00",e:"12:00",sub:"vocacion",t:"Visita Corte Suprema",icon:"🏛️"},
@@ -92,17 +74,19 @@ const DAYS = [
 {s:"13:00",e:"13:30",sub:"selfcare",t:"Almuerzo",icon:"🍽️"},
 {s:"13:30",e:"14:30",sub:"selfcare",t:"Siesta (1 hora)",icon:"💤"},
 {s:"14:30",e:"14:45",sub:"selfcare",t:"Despertar, agua",icon:"💧"},
-{s:"14:45",e:"17:00",sub:"concursos",t:"C-L6 primera mitad (~17p)",icon:"📋"},
+{s:"14:45",e:"17:00",sub:"concursos",t:"C-L6 continuar (~15p)",icon:"📋"},
 {s:"17:00",e:"17:30",sub:"selfcare",t:"Estiramientos (20 min)",icon:"🧘"},
-{s:"17:30",e:"18:15",sub:"concursos",t:"C-L6 continuar (~5p)",icon:"📋"},
+{s:"17:30",e:"18:15",sub:"concursos",t:"C-L6 avanzar (~5p más)",icon:"📋"},
 {s:"18:15",e:"18:30",sub:"selfcare",t:"Prepararse pilates",icon:"✨"},
 {s:"18:30",e:"21:00",sub:"selfcare",t:"Pilates",icon:"🧘"},
 {s:"21:00",e:"22:00",sub:"selfcare",t:"Ducha, descanso",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"02:30",sub:"admin",t:"Admin: adaptar PPT + preparar clase",icon:"📑"},
+{s:"22:30",e:"02:30",sub:"admin",t:"Admin: adaptar PPT + preparar clase (4h)",icon:"📑"},
 {s:"02:30",e:"03:00",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"C-L6 ~22p | Corte ✓ | Admin PPT preparada",alerts:["🏛️ Corte Suprema 8-12","📑 Admin prep ESTA NOCHE"]},
+],sum:"Corte ✓ | C-L6 ~20p | Admin PPT preparada",
+alerts:["🏛️ Corte Suprema 8-12","📑 Admin: preparar clase ESTA NOCHE","📋 Control Concursos en 2 días"]},
 
+// ===== MAR 24 — EXPRESS: Admin cátedra + Concursos cierre =====
 {date:"2026-03-24",wd:"Martes",label:"24 mar",blocks:[
 {s:"03:00",e:"06:15",sub:"selfcare",t:"Dormir (~3h 15min)",icon:"💤"},
 {s:"06:15",e:"07:00",sub:"selfcare",t:"Despertar, desayuno, modafinil",icon:"☀️"},
@@ -114,70 +98,78 @@ const DAYS = [
 {s:"16:00",e:"16:45",sub:"selfcare",t:"Siesta (45 min)",icon:"💤"},
 {s:"16:45",e:"17:00",sub:"selfcare",t:"Despertar, agua, snack",icon:"💧"},
 {s:"17:00",e:"17:30",sub:"selfcare",t:"Yoga suave (30 min)",icon:"🧘"},
-{s:"17:30",e:"18:30",sub:"concursos",t:"C-L6 terminar (~12p)",icon:"📋"},
-{s:"18:30",e:"21:30",sub:"concursos",t:"C-L7 (16p) + C-L8 inicio",icon:"📋",peak:true},
+{s:"17:30",e:"19:00",sub:"concursos",t:"C-L6 terminar (~15p restantes)",icon:"📋"},
+{s:"19:00",e:"21:30",sub:"concursos",t:"C-L1 terminar (20p)",icon:"📋",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"01:30",sub:"concursos",t:"C-L8 terminar + Materia (~8p)",icon:"📋"},
-{s:"01:30",e:"02:30",sub:"concursos",t:"Repaso general: esquemas",icon:"📋"},
-{s:"02:30",e:"03:00",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"🔥 EXPRESS: Admin ✓ | C-L6 ✓ | C-L7 ✓ | C-L8 ✓ | Materia +8p",alerts:["📑 Cátedra Admin hoy","📋 Mañana CONTROL"]},
+{s:"22:30",e:"01:00",sub:"concursos",t:"C-Materia de clases (~14p)",icon:"📋"},
+{s:"01:00",e:"02:00",sub:"concursos",t:"Repaso express: esquemas L1-L6",icon:"📋"},
+{s:"02:00",e:"02:30",sub:"selfcare",t:"Wind-down — confía",icon:"🌙"},
+],sum:"🔥 EXPRESS: Admin ✓ | C-L6 ✓ | C-L1 ✓ | Materia ~14p | Repaso",
+alerts:["📑 Cátedra Admin hoy","📋 Mañana CONTROL Concursos","🔥 EXPRESS: cerrar lecturas"]},
 
+// ===== MIÉ 25 — CONTROL CONCURSOS + pivote Delitos =====
 {date:"2026-03-25",wd:"Miércoles",label:"25 mar",blocks:[
-{s:"03:00",e:"08:30",sub:"selfcare",t:"Dormir (~5.5h)",icon:"💤"},
+{s:"02:30",e:"08:30",sub:"selfcare",t:"Dormir (~6h)",icon:"💤"},
 {s:"08:30",e:"09:00",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
 {s:"09:00",e:"09:30",sub:"selfcare",t:"Estiramientos (20 min)",icon:"🧘"},
-{s:"09:30",e:"10:40",sub:"concursos",t:"Bus → materia (~10p) + repaso",icon:"📋"},
-{s:"10:40",e:"12:20",sub:"concursos",t:"Materia (~14p) + repaso pre-control",icon:"📋"},
+{s:"09:30",e:"10:40",sub:"concursos",t:"Bus → Materia terminar (~13p) + repaso",icon:"📋"},
+{s:"10:40",e:"12:20",sub:"concursos",t:"Repaso final pre-control en uni",icon:"📋"},
 {s:"12:20",e:"13:30",sub:"clase",t:"Clases",icon:"🎓"},
 {s:"13:30",e:"14:50",sub:"selfcare",t:"Almuerzo + descanso",icon:"🍽️"},
 {s:"14:50",e:"17:20",sub:"clase",t:"Clases (incl. CONTROL Concursos)",icon:"📋"},
-{s:"17:20",e:"18:00",sub:"selfcare",t:"¡Concursos terminado!",icon:"🎉"},
+{s:"17:20",e:"18:00",sub:"selfcare",t:"¡Concursos terminado! 🎉",icon:"🎉"},
 {s:"18:00",e:"19:00",sub:"transporte",t:"Bus a casa",icon:"🚌"},
-{s:"19:00",e:"21:30",sub:"delitos",t:"D-L8 (~15p)",icon:"⚖️",peak:true},
+{s:"19:00",e:"21:30",sub:"delitos",t:"D-L8 empezar (~18p)",icon:"⚖️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
 {s:"22:30",e:"01:30",sub:"delitos",t:"D-L8 continuar (~10p)",icon:"⚖️"},
-{s:"01:30",e:"02:00",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"📋 CONTROL Concursos ✓ | D-L8 ~25p",alerts:["📋 CONTROL Concursos (5%)","🔄 Pivote a Delitos"]},
+{s:"01:30",e:"02:00",sub:"selfcare",t:"Wind-down (jueves temprano)",icon:"🌙"},
+],sum:"📋 CONTROL Concursos ✓ ¡LIBERADA! | D-L8 ~28p",
+alerts:["📋 CONTROL Concursos (5%)","🔄 Post-control: pivote a Delitos"]},
 
+// ===== JUE 26 — D-L8 clase + D-L9 + Vocación inicio =====
 {date:"2026-03-26",wd:"Jueves",label:"26 mar",blocks:[
 {s:"02:00",e:"06:15",sub:"selfcare",t:"Dormir (~4h 15min)",icon:"💤"},
 {s:"06:15",e:"07:00",sub:"selfcare",t:"Despertar, desayuno, modafinil",icon:"☀️"},
 {s:"07:00",e:"08:00",sub:"delitos",t:"Bus → repaso D-L8 notas",icon:"⚖️"},
 {s:"08:00",e:"08:30",sub:"clase",t:"Llegar",icon:"🎓"},
 {s:"08:30",e:"11:00",sub:"clase",t:"Clases (Delitos con L8)",icon:"🎓"},
-{s:"11:00",e:"13:00",sub:"delitos",t:"D-L8 terminar + D-L9 inicio (~17p)",icon:"⚖️"},
+{s:"11:00",e:"13:00",sub:"delitos",t:"D-L8 cerrar (~4p) + D-L9 inicio (~12p)",icon:"⚖️"},
 {s:"13:00",e:"14:00",sub:"transporte",t:"Bus a casa",icon:"🚌"},
 {s:"14:00",e:"14:30",sub:"selfcare",t:"Almuerzo",icon:"🍽️"},
 {s:"14:30",e:"15:15",sub:"selfcare",t:"Siesta (45 min)",icon:"💤"},
 {s:"15:15",e:"15:30",sub:"selfcare",t:"Estiramientos (15 min)",icon:"🧘"},
-{s:"15:30",e:"18:30",sub:"delitos",t:"D-L9 continuar (~13p)",icon:"⚖️"},
+{s:"15:30",e:"18:30",sub:"delitos",t:"D-L9 continuar (~15p)",icon:"⚖️"},
 {s:"18:30",e:"19:00",sub:"selfcare",t:"Break, snack",icon:"🍃"},
-{s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación lectura (~7p)",icon:"🏛️",peak:true},
+{s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación: PRIMERA lectura (~8p)",icon:"🏛️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"02:00",sub:"delitos",t:"D-L9 terminar + D-L10 inicio (~15p)",icon:"⚖️"},
+{s:"22:30",e:"02:00",sub:"delitos",t:"D-L9 terminar (~13p) + D-L10 inicio (~5p)",icon:"⚖️"},
 {s:"02:00",e:"02:30",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"D-L8 ✓ | D-L9 ✓ | D-L10 ~8p | Vocación +7p",alerts:["⚖️ D-L8 para clase ✓","🏛️ Vocación ~7p"]},
+],sum:"D-L8 ✓ | D-L9 ✓ (40p) | D-L10 ~5p | 🏛️ Vocación inicio +8p",
+alerts:["⚖️ D-L8 para clase ✓","🏛️ Vocación EMPIEZA HOY","⚠️ Sueño corto, siesta crucial"]},
 
+// ===== VIE 27 — D-L10 + repaso + Vocación =====
 {date:"2026-03-27",wd:"Viernes",label:"27 mar",blocks:[
 {s:"02:30",e:"10:00",sub:"selfcare",t:"Dormir largo (~7.5h)",icon:"💤"},
 {s:"10:00",e:"10:30",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
 {s:"10:30",e:"11:00",sub:"selfcare",t:"Yoga (30 min)",icon:"🧘"},
-{s:"11:00",e:"13:30",sub:"delitos",t:"D-L10 terminar (~24p)",icon:"⚖️"},
+{s:"11:00",e:"13:30",sub:"delitos",t:"D-L10 terminar (~27p restantes)",icon:"⚖️"},
 {s:"13:30",e:"14:00",sub:"selfcare",t:"Almuerzo",icon:"🍽️"},
-{s:"14:00",e:"16:30",sub:"delitos",t:"Repaso L1-L5",icon:"⚖️"},
+{s:"14:00",e:"16:30",sub:"delitos",t:"Repaso L1-L5 (esquemas)",icon:"⚖️"},
 {s:"16:30",e:"17:00",sub:"selfcare",t:"Break, caminar",icon:"🍃"},
 {s:"17:00",e:"19:00",sub:"delitos",t:"Repaso L6-L8",icon:"⚖️"},
 {s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación lectura (~8p)",icon:"🏛️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
 {s:"22:30",e:"01:30",sub:"delitos",t:"Repaso L9-L10 + esquemas",icon:"⚖️"},
-{s:"01:30",e:"02:30",sub:"delitos",t:"Notas generales",icon:"⚖️"},
-{s:"02:30",e:"03:00",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"D-L10 ✓ ¡TODAS terminadas! | Primer repaso | Vocación +8p",alerts:["📚 Día libre completo","⚖️ Cerrar L10 + repaso"]},
+{s:"01:30",e:"02:30",sub:"delitos",t:"Consolidar notas",icon:"⚖️"},
+{s:"02:30",e:"03:00",sub:"selfcare",t:"Wind-down (mañana pilates ⚠️)",icon:"🌙"},
+],sum:"D-L10 ✓ ¡TODAS lecturas terminadas! | Primer repaso | Vocación +8p (16p total)",
+alerts:["📚 Día libre completo","⚖️ Cerrar L10 + primer repaso","🏛️ Vocación +8p"]},
 
+// ===== SÁB 28 — Pilates + Repaso + Vocación dedicado =====
 {date:"2026-03-28",wd:"Sábado",label:"28 mar",blocks:[
 {s:"03:00",e:"06:45",sub:"selfcare",t:"Dormir (~3h 45min)",icon:"💤"},
 {s:"06:45",e:"07:30",sub:"selfcare",t:"Despertar, prepararse",icon:"☀️"},
@@ -187,33 +179,37 @@ const DAYS = [
 {s:"11:30",e:"12:00",sub:"selfcare",t:"Ducha, almuerzo",icon:"🍽️"},
 {s:"12:00",e:"14:30",sub:"delitos",t:"Repaso profundo: puntos débiles",icon:"⚖️"},
 {s:"14:30",e:"15:00",sub:"selfcare",t:"Break",icon:"🍃"},
-{s:"15:00",e:"17:30",sub:"vocacion",t:"Vocación: sesión dedicada (~10p)",icon:"🏛️"},
+{s:"15:00",e:"17:30",sub:"vocacion",t:"Vocación: sesión DEDICADA (~10p)",icon:"🏛️"},
 {s:"17:30",e:"18:00",sub:"selfcare",t:"Estiramientos (20 min)",icon:"🧘"},
-{s:"18:00",e:"19:00",sub:"vocacion",t:"Vocación: esquemas",icon:"🏛️",peak:true},
+{s:"18:00",e:"19:00",sub:"vocacion",t:"Vocación: esquemas de lo leído",icon:"🏛️",peak:true},
 {s:"19:00",e:"21:30",sub:"delitos",t:"Delitos: esquemas síntesis",icon:"⚖️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
 {s:"22:30",e:"02:00",sub:"delitos",t:"Delitos: autoevaluación",icon:"⚖️"},
 {s:"02:00",e:"02:30",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"Repaso profundo Delitos | Vocación +10p + esquemas",alerts:["🏛️ Vocación sesión DEDICADA","⚖️ Control en 3 días"]},
+],sum:"Repaso profundo Delitos | Vocación +10p (26p total) + esquemas",
+alerts:["🏛️ Vocación sesión DEDICADA 2.5h","⚖️ Control en 3 días"]},
 
+// ===== DOM 29 — Repaso Delitos + Vocación cierre =====
 {date:"2026-03-29",wd:"Domingo",label:"29 mar",blocks:[
 {s:"02:30",e:"10:00",sub:"selfcare",t:"Dormir largo (~7.5h)",icon:"💤"},
 {s:"10:00",e:"10:30",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
 {s:"10:30",e:"11:00",sub:"selfcare",t:"Yoga (30 min)",icon:"🧘"},
 {s:"11:00",e:"13:30",sub:"delitos",t:"Segundo repaso L5-L10",icon:"⚖️"},
 {s:"13:30",e:"14:00",sub:"selfcare",t:"Almuerzo",icon:"🍽️"},
-{s:"14:00",e:"16:00",sub:"delitos",t:"Esquemas finales",icon:"⚖️"},
+{s:"14:00",e:"16:00",sub:"delitos",t:"Esquemas finales, conceptos clave",icon:"⚖️"},
 {s:"16:00",e:"16:30",sub:"selfcare",t:"Break, caminar",icon:"🍃"},
-{s:"16:30",e:"18:30",sub:"vocacion",t:"Vocación: terminar lectura (~5p) + notas",icon:"🏛️"},
+{s:"16:30",e:"18:30",sub:"vocacion",t:"Vocación: terminar lectura (~4p) + notas",icon:"🏛️"},
 {s:"18:30",e:"19:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación: REPASO completo",icon:"🏛️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
 {s:"22:30",e:"02:00",sub:"delitos",t:"Delitos: simulación control",icon:"⚖️"},
 {s:"02:00",e:"02:30",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"Delitos repaso ✓ | Vocación lectura COMPLETA + repaso",alerts:["⚖️ Control en 2 días","🏛️ Cerrar lectura Vocación"]},
+],sum:"Delitos repaso ✓ | Vocación COMPLETA ✓ (30p) + primer repaso",
+alerts:["⚖️ Control Delitos en 2 días","🏛️ Cerrar lectura Vocación HOY"]},
 
+// ===== LUN 30 — Ética + Delitos cierre + Vocación repaso =====
 {date:"2026-03-30",wd:"Lunes",label:"30 mar",blocks:[
 {s:"02:30",e:"08:30",sub:"selfcare",t:"Dormir (~6h)",icon:"💤"},
 {s:"08:30",e:"09:00",sub:"selfcare",t:"Despertar, desayuno",icon:"☀️"},
@@ -234,15 +230,17 @@ const DAYS = [
 {s:"22:30",e:"01:00",sub:"delitos",t:"Delitos: repaso FINAL",icon:"⚖️"},
 {s:"01:00",e:"02:00",sub:"selfcare",t:"Relax — confía en lo estudiado",icon:"🌙"},
 {s:"02:00",e:"02:30",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"Delitos LISTO ✓ | Ética ✓ | Vocación repaso",alerts:["⚖️ MAÑANA CONTROL Delitos","📘 Ética para clase"]},
+],sum:"Delitos LISTO ✓ | Ética ✓ | Vocación repaso",
+alerts:["⚖️ MAÑANA CONTROL Delitos","📘 Ética para clase"]},
 
+// ===== MAR 31 — CONTROL DELITOS + Vocación intensivo =====
 {date:"2026-03-31",wd:"Martes",label:"31 mar",blocks:[
 {s:"02:30",e:"06:15",sub:"selfcare",t:"Dormir (~3h 45min)",icon:"💤"},
 {s:"06:15",e:"07:00",sub:"selfcare",t:"Despertar, desayuno, modafinil",icon:"☀️"},
 {s:"07:00",e:"08:00",sub:"delitos",t:"Bus → último repaso esquemas",icon:"⚖️"},
 {s:"08:00",e:"08:30",sub:"delitos",t:"Repaso final en uni",icon:"⚖️"},
 {s:"08:30",e:"13:30",sub:"clase",t:"Clases (incl. CONTROL Delitos)",icon:"⚖️"},
-{s:"13:30",e:"15:00",sub:"selfcare",t:"Almuerzo + descanso",icon:"🍽️"},
+{s:"13:30",e:"15:00",sub:"selfcare",t:"Almuerzo + descanso — ¡ya pasó lo peor!",icon:"🍽️"},
 {s:"15:00",e:"16:00",sub:"transporte",t:"Bus a casa",icon:"🚌"},
 {s:"16:00",e:"16:45",sub:"selfcare",t:"Siesta (45 min)",icon:"💤"},
 {s:"16:45",e:"17:00",sub:"selfcare",t:"Despertar, agua",icon:"💧"},
@@ -251,11 +249,13 @@ const DAYS = [
 {s:"19:00",e:"21:30",sub:"vocacion",t:"Vocación: repaso profundo",icon:"🏛️",peak:true},
 {s:"21:30",e:"22:00",sub:"selfcare",t:"Break",icon:"🍃"},
 {s:"22:00",e:"22:30",sub:"selfcare",t:"Cena",icon:"🍽️"},
-{s:"22:30",e:"01:00",sub:"vocacion",t:"Vocación: segundo repaso",icon:"🏛️"},
-{s:"01:00",e:"02:30",sub:"vocacion",t:"Vocación: autoevaluación",icon:"🏛️"},
+{s:"22:30",e:"01:00",sub:"vocacion",t:"Vocación: segundo repaso completo",icon:"🏛️"},
+{s:"01:00",e:"02:30",sub:"vocacion",t:"Vocación: autoevaluación + puntos débiles",icon:"🏛️"},
 {s:"02:30",e:"03:00",sub:"selfcare",t:"Wind-down",icon:"🌙"},
-],sum:"⚖️ Control Delitos ✓ ¡HECHO! | Vocación ~9h intensivo",alerts:["⚖️ CONTROL Delitos (15%)","🏛️ TODO a Vocación post-control"]},
+],sum:"⚖️ Control Delitos ✓ ¡HECHO! | Vocación ~9h intensivo",
+alerts:["⚖️ CONTROL Delitos (15%)","🏛️ Post-control: TODO a Vocación"]},
 
+// ===== MIÉ 1 ABR — SOLEMNE VOCACIÓN =====
 {date:"2026-04-01",wd:"Miércoles",label:"1 abr",blocks:[
 {s:"03:00",e:"08:30",sub:"selfcare",t:"Dormir (~5.5h)",icon:"💤"},
 {s:"08:30",e:"09:00",sub:"selfcare",t:"Despertar, desayuno nutritivo",icon:"☀️"},
@@ -263,26 +263,33 @@ const DAYS = [
 {s:"09:30",e:"10:40",sub:"vocacion",t:"Bus → repaso final esquemas",icon:"🏛️"},
 {s:"10:40",e:"12:20",sub:"vocacion",t:"Último repaso en uni",icon:"🏛️"},
 {s:"12:20",e:"17:20",sub:"clase",t:"Clases (incl. SOLEMNE Vocación)",icon:"🏛️"},
-{s:"17:20",e:"18:00",sub:"selfcare",t:"Lo lograste",icon:"🌟"},
+{s:"17:20",e:"18:00",sub:"selfcare",t:"Lo lograste 🌟",icon:"🌟"},
 {s:"18:00",e:"19:00",sub:"transporte",t:"Bus a casa",icon:"🚌"},
 {s:"19:00",e:"23:59",sub:"selfcare",t:"DESCANSO MERECIDO",icon:"🎉"},
-],sum:"🏛️ Solemne Vocación ✓ | ¡Terminaste! 🎉",alerts:["🏛️ SOLEMNE Vocación (30%)","💪 Confía en tu preparación"]},
+],sum:"🏛️ Solemne Vocación ✓ | ¡Terminaste! 🎉",
+alerts:["🏛️ SOLEMNE Vocación (30%)","💪 30p leídas + 12h de repaso. Confía."]},
 ];
 
-/* ─── helpers ─── */
+const DL=[
+{date:"2026-03-24",text:"D-L7 para clase + Cátedra Admin",sub:"delitos"},
+{date:"2026-03-25",text:"CONTROL Concursos (5%)",sub:"concursos"},
+{date:"2026-03-26",text:"D-L8 para clase",sub:"delitos"},
+{date:"2026-03-30",text:"Ética lectura ~6p",sub:"etica"},
+{date:"2026-03-31",text:"CONTROL Delitos (15%)",sub:"delitos"},
+{date:"2026-04-01",text:"SOLEMNE Vocación (30%)",sub:"vocacion"},
+];
+
 function t2m(t){const[h,m]=t.split(":").map(Number);return h*60+m}
 function dur(a,b){let s=t2m(a),e=t2m(b);if(e<=s)e+=1440;return e-s}
 function fmtDur(min){if(min>=60){const h=Math.floor(min/60);const m=min%60;return m>0?`${h}h ${m}m`:`${h}h`}return`${min}m`}
 function fmtTime(t){const[h,m]=t.split(":");const hr=parseInt(h);const ap=hr>=12&&hr<24?"PM":"AM";const d=hr===0?12:hr>12?hr-12:hr;return`${d}:${m} ${ap}`}
 function getNowMin(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));return s.getHours()*60+s.getMinutes()}
-function getSantiagoDate(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));return`${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}-${String(s.getDate()).padStart(2,"0")}`}
-/* Before 4AM, we're still "in" the previous day's schedule since all days run until ~3AM */
 function getScheduleDate(){
   const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));
-  if(s.getHours()<4){s.setDate(s.getDate()-1)}
+  if(s.getHours()<4)s.setDate(s.getDate()-1);
   return`${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}-${String(s.getDate()).padStart(2,"0")}`
 }
-function getClockStr(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));const h=String(s.getHours()).padStart(2,"0");const m=String(s.getMinutes()).padStart(2,"0");return`${h}:${m}`}
+function getClockStr(){const n=new Date();const s=new Date(n.toLocaleString("en-US",{timeZone:"America/Santiago"}));return`${String(s.getHours()).padStart(2,"0")}:${String(s.getMinutes()).padStart(2,"0")}`}
 
 function App(){
   const[sel,setSel]=useState(()=>{const t=getScheduleDate();const i=DAYS.findIndex(d=>d.date===t);return i>=0?i:0});
@@ -294,15 +301,10 @@ function App(){
   useEffect(()=>{if(curRef.current)curRef.current.scrollIntoView({behavior:"smooth",block:"center"})},[sel]);
 
   const day=DAYS[sel];
-  /* A day's schedule is "active" if: it's the schedule date (accounting for overnight) */
   const isActive=day.date===getScheduleDate();
 
   const currentBlock=useMemo(()=>{
     if(!isActive)return-1;
-    /* now is 0-1439 (real clock minutes). For overnight blocks (start > end),
-       we add 1440 to both end and now-if-small to compare correctly.
-       Key fix: only match overnight blocks (start > 720) when now < 240 (before 4AM),
-       meaning we're in the tail end. Don't match them when now > 720 (afternoon). */
     for(let i=0;i<day.blocks.length;i++){
       const b=day.blocks[i];
       let sA=t2m(b.s),eA=t2m(b.e);
@@ -322,8 +324,10 @@ function App(){
     return Math.max(0,e-n);
   },[now]);
 
+  const udl=useMemo(()=>DL.filter(d=>d.date>=day.date).slice(0,5),[day.date]);
+
   return(
-    <div style={{background:"#faf9f7",minHeight:"100vh",maxWidth:480,margin:"0 auto",position:"relative"}}>
+    <div style={{background:"#faf9f7",minHeight:"100vh",maxWidth:480,margin:"0 auto"}}>
       {/* Header */}
       <div style={{padding:"20px 20px 0",position:"sticky",top:0,background:"#faf9f7",zIndex:10}}>
         <div style={{display:"flex",gap:2,marginBottom:12,overflowX:"auto",paddingBottom:6}}>
@@ -338,7 +342,7 @@ function App(){
                 background:isSel?"#1a1a1a":isT?"rgba(231,76,60,0.08)":"transparent",
                 display:"flex",flexDirection:"column",alignItems:"center",gap:1,flexShrink:0
               }}>
-                <span style={{fontSize:9,color:isSel?"#999":"#999",textTransform:"uppercase",letterSpacing:.5}}>{d.wd.slice(0,3)}</span>
+                <span style={{fontSize:9,color:"#999",textTransform:"uppercase",letterSpacing:.5}}>{d.wd.slice(0,3)}</span>
                 <span style={{fontSize:16,fontWeight:isSel?700:500,color:isSel?"#fff":isT?"#e74c3c":"#1a1a1a"}}>{dn}</span>
                 {isExam&&<span style={{width:5,height:5,borderRadius:"50%",background:"#e74c3c",marginTop:1}}/>}
               </button>
@@ -352,13 +356,26 @@ function App(){
           </div>
           {isActive&&<div style={{fontSize:28,fontWeight:300,fontVariantNumeric:"tabular-nums"}}>{clock}</div>}
         </div>
-        <div style={{display:"flex",flexDirection:"column",gap:4,marginBottom:10}}>
-          {day.alerts.map((a,i)=>(
-            <div key={i} style={{fontSize:12,color:"#e67e22",padding:"6px 10px",background:"rgba(230,126,34,0.06)",borderRadius:8}}>{a}</div>
-          ))}
-        </div>
+        {day.alerts.map((a,i)=>(
+          <div key={i} style={{fontSize:12,color:"#e67e22",padding:"6px 10px",marginBottom:4,background:"rgba(230,126,34,0.06)",borderRadius:8}}>{a}</div>
+        ))}
         <div style={{fontSize:11.5,color:"#666",padding:"8px 12px",background:"#fff",borderRadius:10,marginBottom:12,boxShadow:"0 1px 3px rgba(0,0,0,0.04)",border:"1px solid rgba(0,0,0,0.04)"}}>
           {day.sum}
+        </div>
+        {/* Deadlines */}
+        <div style={{marginBottom:12}}>
+          {udl.slice(0,3).map((d,i)=>{
+            const sub=SUB[d.sub];
+            const diff=Math.round((new Date(d.date+"T12:00:00")-new Date(day.date+"T12:00:00"))/864e5);
+            const u=diff===0?"HOY":diff===1?"mañana":`en ${diff}d`;
+            return(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0",fontSize:11.5}}>
+                <span style={{width:6,height:6,borderRadius:"50%",background:sub.color,flexShrink:0}}/>
+                <span style={{color:"#666",flex:1}}>{d.text}</span>
+                <span style={{color:diff<=1?"#e67e22":"#bbb",fontWeight:diff<=1?600:400,fontVariantNumeric:"tabular-nums",fontSize:10}}>{u}</span>
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -380,7 +397,7 @@ function App(){
                   <span style={{fontSize:10,color:"#bbb"}}>{fmtDur(gap)} libre</span>
                 </div>
               )}
-              <div ref={isCur?curRef:null} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 0",opacity:isPast?.4:1,position:"relative"}}>
+              <div ref={isCur?curRef:null} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 0",opacity:isPast?.4:1}}>
                 <div style={{width:42,flexShrink:0,textAlign:"right",paddingTop:10}}>
                   <div style={{fontSize:11,fontWeight:600,color:isCur?"#e74c3c":"#999",fontVariantNumeric:"tabular-nums"}}>{fmtTime(b.s)}</div>
                 </div>
@@ -397,11 +414,9 @@ function App(){
                   )}
                 </div>
                 <div style={{
-                  flex:1,
-                  background:isCur?"#fff":sub.bg,
+                  flex:1,background:isCur?"#fff":sub.bg,
                   border:isCur?`2px solid ${sub.color}`:`1px solid ${sub.color}22`,
-                  borderRadius:14,
-                  padding:isCur?"12px 14px":"10px 12px",
+                  borderRadius:14,padding:isCur?"12px 14px":"10px 12px",
                   boxShadow:isCur?`0 4px 16px ${sub.color}20`:"0 1px 2px rgba(0,0,0,0.02)"
                 }}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
@@ -413,7 +428,7 @@ function App(){
                   </div>
                   {isCur&&rem>0&&(
                     <div style={{marginTop:8}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
                         <span style={{fontSize:11,fontWeight:600,color:sub.color}}>{fmtDur(rem)} restantes</span>
                         <span style={{fontSize:10,color:"#bbb"}}>{fmtTime(b.e)}</span>
                       </div>
@@ -423,9 +438,7 @@ function App(){
                     </div>
                   )}
                   {b.peak&&!isPast&&(
-                    <div style={{marginTop:6,fontSize:10,color:sub.color,fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
-                      <span>⚡</span>PICO COGNITIVO
-                    </div>
+                    <div style={{marginTop:6,fontSize:10,color:sub.color,fontWeight:600}}>⚡ PICO COGNITIVO</div>
                   )}
                   <div style={{marginTop:4,fontSize:10,color:sub.color,fontWeight:500}}>{sub.label}</div>
                 </div>
@@ -434,10 +447,7 @@ function App(){
           );
         })}
         <div style={{display:"flex",gap:12,alignItems:"center",padding:"8px 0 0"}}>
-          <div style={{width:42}}/>
-          <div style={{width:20,display:"flex",justifyContent:"center"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:"#ddd"}}/>
-          </div>
+          <div style={{width:42}}/><div style={{width:20,display:"flex",justifyContent:"center"}}><div style={{width:8,height:8,borderRadius:"50%",background:"#ddd"}}/></div>
           <span style={{fontSize:11,color:"#bbb"}}>Fin del día</span>
         </div>
       </div>
@@ -445,7 +455,7 @@ function App(){
   );
 }
 
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.render(<App/>,document.getElementById("root"));
 </script>
 </body>
 </html>
