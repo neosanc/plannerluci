@@ -1,0 +1,122 @@
+name: Construir el APK de Mis calorías
+
+# Se puede lanzar a mano desde la pestaña Actions, y se lanza solo
+# cada vez que cambia la app.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - claude/calorie-counter-android-app-j65yn6
+    paths:
+      - 'calorias/**'
+      - 'app-android/**'
+      - '.github/workflows/apk.yml'
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: app-android/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Preparar el SDK de Android
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+
+      # La clave de firma no está en el repositorio. Si existe el secreto
+      # ANDROID_KEYSTORE_B64 se usa esa (y todas las versiones se pueden instalar
+      # una encima de otra); si no, se genera una temporal solo para esta compilación.
+      - name: Preparar la clave de firma
+        id: clave
+        env:
+          CLAVE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          DESTINO=app-android/android/app/miscalorias.keystore
+          if [ -n "$CLAVE_B64" ]; then
+            echo "$CLAVE_B64" | base64 -d > "$DESTINO"
+            echo "propia=si" >> "$GITHUB_OUTPUT"
+            echo "Firmando con la clave guardada en los secretos del repositorio."
+          else
+            keytool -genkeypair -keystore "$DESTINO" -alias miscalorias \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass miscalorias -keypass miscalorias \
+              -dname "CN=Mis calorias, OU=Familia, O=Personal, C=ES"
+            base64 -w0 "$DESTINO" > clave-para-el-secreto.txt
+            echo "propia=no" >> "$GITHUB_OUTPUT"
+            echo "Firmando con una clave temporal (ver el aviso al final del resumen)."
+          fi
+
+      - name: Instalar dependencias
+        working-directory: app-android
+        run: npm ci
+
+      - name: Meter la app web dentro del proyecto Android
+        working-directory: app-android
+        run: npm run sync
+
+      - name: Compilar el APK firmado
+        working-directory: app-android/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon \
+            -PappVersionCode=${{ github.run_number }} \
+            -PappVersionName=2.0.${{ github.run_number }}
+
+      - name: Preparar el archivo para descargar
+        run: |
+          mkdir -p salida
+          cp app-android/android/app/build/outputs/apk/release/app-release.apk salida/mis-calorias.apk
+          ls -la salida
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mis-calorias-apk
+          path: salida/mis-calorias.apk
+
+      # Solo la primera vez: deja a mano el texto de la clave para guardarlo como secreto.
+      - name: Guardar la clave generada
+        if: steps.clave.outputs.propia == 'no'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clave-de-firma
+          path: clave-para-el-secreto.txt
+          retention-days: 7
+
+      # Publica el APK en una release fija, para que el enlace de descarga
+      # sea siempre el mismo y se pueda abrir desde el móvil.
+      - name: Publicar el APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk --yes --cleanup-tag || true
+          gh release create apk salida/mis-calorias.apk \
+            --title "Mis calorías — última versión" \
+            --notes "APK para instalar en Android. Descárgalo desde el móvil y ábrelo. Versión 2.0.${{ github.run_number }}."
+
+      - name: Resumen
+        run: |
+          echo "### APK listo :iphone:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Descarga desde el móvil: https://github.com/${{ github.repository }}/releases/download/apk/mis-calorias.apk" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.clave.outputs.propia }}" = "no" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> **Aviso**: esta versión va firmada con una clave temporal, así que la próxima no se podrá instalar encima." >> "$GITHUB_STEP_SUMMARY"
+            echo "> Para arreglarlo: descarga el artefacto \`clave-de-firma\` de esta misma página, abre el archivo," >> "$GITHUB_STEP_SUMMARY"
+            echo "> copia todo el texto y guárdalo en **Settings → Secrets and variables → Actions → New repository secret**" >> "$GITHUB_STEP_SUMMARY"
+            echo "> con el nombre \`ANDROID_KEYSTORE_B64\`. A partir de ahí, todas las versiones se instalan una encima de otra." >> "$GITHUB_STEP_SUMMARY"
+          fi
