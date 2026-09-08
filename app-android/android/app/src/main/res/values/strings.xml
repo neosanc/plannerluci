@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mis calorías</string>
+    <string name="title_activity_main">Mis calorías</string>
+    <string name="package_name">es.miscalorias.app</string>
+    <string name="custom_url_scheme">es.miscalorias.app</string>
+</resources>

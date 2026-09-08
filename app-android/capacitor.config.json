@@ -1,0 +1,14 @@
+{
+  "appId": "es.miscalorias.app",
+  "appName": "Mis calorías",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_calorias",
+      "iconColor": "#7C3AED"
+    }
+  }
+}

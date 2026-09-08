@@ -1,5 +1,5 @@
 /* Guarda la app en el móvil para que funcione sin internet. */
-const CACHE = "miscalorias-v1";
+const CACHE = "miscalorias-v2";
 const ARCHIVOS = [
   "./", "./index.html", "./estilos.css", "./alimentos.js", "./app.js",
   "./manifest.webmanifest", "./icono-192.png", "./icono-512.png"

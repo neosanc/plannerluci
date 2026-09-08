@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mis calorías</title>
-<meta name="description" content="Contador de calorías sencillo, en español y sin registro.">
-<meta name="theme-color" content="#f4f3ef">
+<meta name="description" content="Contador de calorías sencillo, en español, sin registro.">
+<meta name="theme-color" content="#f5f6fb">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icono-192.png">
 <link rel="apple-touch-icon" href="icono-192.png">
@@ -16,61 +16,132 @@
 </head>
 <body>
 
-<header>
-  <button class="flecha" id="dia-antes" aria-label="Día anterior">‹</button>
-  <div class="fecha"><b id="fecha-titulo">Hoy</b><span id="fecha-sub"></span></div>
-  <button class="flecha" id="dia-despues" aria-label="Día siguiente">›</button>
+<header id="cabecera">
+  <div class="cab-fila">
+    <b class="saludo" id="saludo">Hola</b>
+    <button class="chip-racha" id="chip-racha" data-vista="logros"><span>🔥</span><span id="racha-num">0</span></button>
+  </div>
+  <div class="cab-fila">
+    <span class="fecha" id="fecha-sub"></span>
+    <div class="flechas">
+      <button class="flecha" id="dia-antes" aria-label="Día anterior">‹</button>
+      <button class="flecha" id="dia-despues" aria-label="Día siguiente">›</button>
+    </div>
+  </div>
 </header>
 
 <main>
+  <!-- ============ HOY ============ -->
   <section id="vista-hoy">
-    <div class="tarjeta">
-      <div class="anillo anillo-caja">
-        <svg width="210" height="210" viewBox="0 0 210 210" aria-hidden="true">
-          <circle cx="105" cy="105" r="88" fill="none" stroke="#eceae4" stroke-width="17"></circle>
-          <circle id="anillo-progreso" cx="105" cy="105" r="88" fill="none" stroke="#16a34a"
-                  stroke-width="17" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"></circle>
+    <div class="hero">
+      <div class="anillo-caja">
+        <svg width="208" height="208" viewBox="0 0 208 208" aria-hidden="true">
+          <defs>
+            <linearGradient id="grad-anillo" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffffff"></stop>
+              <stop offset="100%" stop-color="#a7f3d0"></stop>
+            </linearGradient>
+            <linearGradient id="grad-anillo-pasado" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fde68a"></stop>
+              <stop offset="100%" stop-color="#fb7185"></stop>
+            </linearGradient>
+          </defs>
+          <circle cx="104" cy="104" r="86" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="16"></circle>
+          <circle id="anillo-progreso" cx="104" cy="104" r="86" fill="none" stroke="url(#grad-anillo)"
+                  stroke-width="16" stroke-linecap="round" stroke-dasharray="541" stroke-dashoffset="541"></circle>
         </svg>
         <div class="centro">
           <div class="grande"><span id="kcal-comidas">0</span><small> kcal</small></div>
           <div class="restante" id="kcal-restantes"></div>
         </div>
       </div>
-      <div class="barra-obj">
-        <span>Objetivo del día: <b id="kcal-objetivo">2000</b> kcal</span>
-        <span id="kcal-porcentaje">0 %</span>
+      <div class="mini">
+        <div><b id="mini-objetivo">0</b><span>Objetivo</span></div>
+        <div><b id="mini-porcentaje">0 %</b><span>Llevas</span></div>
+        <div><b id="mini-agua">0/8</b><span>Agua</span></div>
       </div>
     </div>
+
+    <div class="tarjeta">
+      <div class="agua-cab">
+        <div class="titulo">💧 Vasos de agua</div>
+        <div class="cuenta" id="agua-cuenta">0 / 8</div>
+      </div>
+      <div class="vasos" id="vasos"></div>
+    </div>
+
     <div id="comidas"></div>
   </section>
 
-  <section id="vista-peso" class="oculto">
+  <!-- ============ PROGRESO ============ -->
+  <section id="vista-progreso" class="oculto">
     <div class="tarjeta">
-      <div class="titulo">Peso</div>
+      <div class="titulo">⚖️ Peso</div>
       <div id="peso-resumen"></div>
       <svg class="grafico" id="peso-grafico" viewBox="0 0 320 170"></svg>
     </div>
     <div class="tarjeta">
-      <div class="titulo">Apuntar peso de hoy</div>
+      <div class="titulo">Apuntar el peso de hoy</div>
       <div class="fila">
         <input id="peso-entrada" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 68,5">
-        <button class="boton" id="peso-guardar" style="flex:0 0 110px">Guardar</button>
+        <button class="boton" id="peso-guardar" style="flex:0 0 120px">Guardar</button>
       </div>
       <div id="peso-lista"></div>
     </div>
+    <div class="tarjeta">
+      <div class="titulo">🍽️ Últimos 7 días</div>
+      <div class="barras" id="barras"></div>
+      <div class="nota" id="media-semana"></div>
+    </div>
   </section>
 
+  <!-- ============ LOGROS ============ -->
+  <section id="vista-logros" class="oculto">
+    <div class="tarjeta">
+      <div class="racha-grande">
+        <div class="llama">🔥</div>
+        <div class="n" id="racha-grande">0</div>
+        <p id="racha-texto">días seguidos apuntando</p>
+      </div>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo">🏅 Medallas <span id="medallas-cuenta"></span></div>
+      <div class="medallas" id="medallas"></div>
+    </div>
+  </section>
+
+  <!-- ============ AJUSTES ============ -->
   <section id="vista-ajustes" class="oculto">
     <div class="tarjeta">
-      <div class="titulo">Objetivo diario</div>
+      <div class="titulo">🎯 Objetivo diario</div>
       <label class="campo"><span>Calorías al día</span>
         <input id="aj-objetivo" type="number" inputmode="numeric" min="800" max="5000" step="10">
       </label>
       <button class="boton gris" id="aj-calcular">Calcular un objetivo para mí</button>
       <div class="nota">Es una estimación orientativa. Si hay alguna enfermedad de por medio o quieres bajar bastante peso, que lo revise el médico.</div>
     </div>
+
     <div class="tarjeta">
-      <div class="titulo">Datos</div>
+      <div class="titulo">🔔 Recordatorios</div>
+      <div class="interruptor"><b>Avisarme cada día</b>
+        <button class="palanca" id="aj-avisos" aria-label="Activar recordatorios"></button>
+      </div>
+      <div id="horas-avisos">
+        <div class="fila">
+          <label class="campo"><span>Desayuno</span><input id="aj-hora-desayuno" type="time"></label>
+          <label class="campo"><span>Comida</span><input id="aj-hora-comida" type="time"></label>
+        </div>
+        <div class="fila">
+          <label class="campo"><span>Cena</span><input id="aj-hora-cena" type="time"></label>
+          <label class="campo"><span>Agua</span><input id="aj-hora-agua" type="time"></label>
+        </div>
+        <button class="boton gris" id="aj-probar">Probar un aviso ahora</button>
+      </div>
+      <div class="nota" id="nota-avisos"></div>
+    </div>
+
+    <div class="tarjeta">
+      <div class="titulo">👤 Datos</div>
       <label class="campo"><span>Nombre</span><input id="aj-nombre" type="text" placeholder="Gema"></label>
       <div class="fila">
         <label class="campo"><span>Edad</span><input id="aj-edad" type="number" inputmode="numeric" min="14" max="110"></label>
@@ -97,10 +168,14 @@
           <option value="-500">Bajar más rápido</option>
         </select>
       </label>
+      <label class="campo"><span>Vasos de agua al día</span>
+        <input id="aj-agua" type="number" inputmode="numeric" min="4" max="12">
+      </label>
     </div>
+
     <div class="tarjeta">
-      <div class="titulo">Copia de seguridad</div>
-      <div class="nota" style="margin:0 0 12px">Los datos se guardan solo en este teléfono. Si cambia de móvil, copie el texto y péguelo en el móvil nuevo.</div>
+      <div class="titulo">💾 Copia de seguridad</div>
+      <div class="nota" style="margin:0 0 12px">Los datos se guardan solo en este teléfono. Si cambia de móvil, copie el texto y péguelo en el nuevo.</div>
       <button class="boton gris" id="aj-exportar">Copiar mis datos</button>
       <button class="boton gris" id="aj-importar">Pegar datos de otro móvil</button>
       <button class="boton roja" id="aj-borrar">Borrar todo y empezar de cero</button>
@@ -110,12 +185,14 @@
 </main>
 
 <nav>
-  <button data-vista="hoy" class="activa"><span class="i">🍽️</span>Comidas</button>
-  <button data-vista="peso"><span class="i">⚖️</span>Peso</button>
+  <button data-vista="hoy" class="activa"><span class="i">🍽️</span>Hoy</button>
+  <button data-vista="progreso"><span class="i">📈</span>Progreso</button>
+  <button data-vista="logros"><span class="i">🏅</span>Logros</button>
   <button data-vista="ajustes"><span class="i">⚙️</span>Ajustes</button>
 </nav>
 
 <div id="hoja"></div>
+<div id="celebracion"></div>
 
 <script src="alimentos.js"></script>
 <script src="app.js"></script>
