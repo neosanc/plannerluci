@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis calorías</title>
+<meta name="description" content="Contador de calorías sencillo, en español y sin registro.">
+<meta name="theme-color" content="#f4f3ef">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mis calorías">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<header>
+  <button class="flecha" id="dia-antes" aria-label="Día anterior">‹</button>
+  <div class="fecha"><b id="fecha-titulo">Hoy</b><span id="fecha-sub"></span></div>
+  <button class="flecha" id="dia-despues" aria-label="Día siguiente">›</button>
+</header>
+
+<main>
+  <section id="vista-hoy">
+    <div class="tarjeta">
+      <div class="anillo anillo-caja">
+        <svg width="210" height="210" viewBox="0 0 210 210" aria-hidden="true">
+          <circle cx="105" cy="105" r="88" fill="none" stroke="#eceae4" stroke-width="17"></circle>
+          <circle id="anillo-progreso" cx="105" cy="105" r="88" fill="none" stroke="#16a34a"
+                  stroke-width="17" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"></circle>
+        </svg>
+        <div class="centro">
+          <div class="grande"><span id="kcal-comidas">0</span><small> kcal</small></div>
+          <div class="restante" id="kcal-restantes"></div>
+        </div>
+      </div>
+      <div class="barra-obj">
+        <span>Objetivo del día: <b id="kcal-objetivo">2000</b> kcal</span>
+        <span id="kcal-porcentaje">0 %</span>
+      </div>
+    </div>
+    <div id="comidas"></div>
+  </section>
+
+  <section id="vista-peso" class="oculto">
+    <div class="tarjeta">
+      <div class="titulo">Peso</div>
+      <div id="peso-resumen"></div>
+      <svg class="grafico" id="peso-grafico" viewBox="0 0 320 170"></svg>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo">Apuntar peso de hoy</div>
+      <div class="fila">
+        <input id="peso-entrada" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 68,5">
+        <button class="boton" id="peso-guardar" style="flex:0 0 110px">Guardar</button>
+      </div>
+      <div id="peso-lista"></div>
+    </div>
+  </section>
+
+  <section id="vista-ajustes" class="oculto">
+    <div class="tarjeta">
+      <div class="titulo">Objetivo diario</div>
+      <label class="campo"><span>Calorías al día</span>
+        <input id="aj-objetivo" type="number" inputmode="numeric" min="800" max="5000" step="10">
+      </label>
+      <button class="boton gris" id="aj-calcular">Calcular un objetivo para mí</button>
+      <div class="nota">Es una estimación orientativa. Si hay alguna enfermedad de por medio o quieres bajar bastante peso, que lo revise el médico.</div>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo">Datos</div>
+      <label class="campo"><span>Nombre</span><input id="aj-nombre" type="text" placeholder="Gema"></label>
+      <div class="fila">
+        <label class="campo"><span>Edad</span><input id="aj-edad" type="number" inputmode="numeric" min="14" max="110"></label>
+        <label class="campo"><span>Altura (cm)</span><input id="aj-altura" type="number" inputmode="numeric" min="120" max="220"></label>
+      </div>
+      <div class="fila">
+        <label class="campo"><span>Peso (kg)</span><input id="aj-peso" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label class="campo"><span>Sexo</span>
+          <select id="aj-sexo"><option value="m">Mujer</option><option value="h">Hombre</option></select>
+        </label>
+      </div>
+      <label class="campo"><span>Actividad diaria</span>
+        <select id="aj-actividad">
+          <option value="1.2">Poca (casa y poco más)</option>
+          <option value="1.375">Ligera (paseos, 1-2 días de ejercicio)</option>
+          <option value="1.55">Media (ejercicio 3-5 días)</option>
+          <option value="1.725">Alta (ejercicio casi a diario)</option>
+        </select>
+      </label>
+      <label class="campo"><span>Qué quiere hacer</span>
+        <select id="aj-plan">
+          <option value="0">Mantener el peso</option>
+          <option value="-300">Bajar poco a poco</option>
+          <option value="-500">Bajar más rápido</option>
+        </select>
+      </label>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo">Copia de seguridad</div>
+      <div class="nota" style="margin:0 0 12px">Los datos se guardan solo en este teléfono. Si cambia de móvil, copie el texto y péguelo en el móvil nuevo.</div>
+      <button class="boton gris" id="aj-exportar">Copiar mis datos</button>
+      <button class="boton gris" id="aj-importar">Pegar datos de otro móvil</button>
+      <button class="boton roja" id="aj-borrar">Borrar todo y empezar de cero</button>
+    </div>
+    <div class="nota" style="text-align:center;margin-bottom:10px" id="version-app"></div>
+  </section>
+</main>
+
+<nav>
+  <button data-vista="hoy" class="activa"><span class="i">🍽️</span>Comidas</button>
+  <button data-vista="peso"><span class="i">⚖️</span>Peso</button>
+  <button data-vista="ajustes"><span class="i">⚙️</span>Ajustes</button>
+</nav>
+
+<div id="hoja"></div>
+
+<script src="alimentos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
