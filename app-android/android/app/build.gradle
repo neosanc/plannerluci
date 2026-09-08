@@ -17,20 +17,23 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    /* Firma de la app. La clave está aquí a propósito: es una app familiar que se
-       instala a mano, y así todas las versiones se firman igual y se pueden
-       actualizar encima de la anterior sin desinstalarla. */
+    /* Firma de la app. La clave NO está en el repositorio: la pone GitHub Actions
+       en cada compilación (desde el secreto ANDROID_KEYSTORE_B64 si existe, y si no
+       genera una temporal). Sin clave, se compila igual pero sin firmar. */
+    def ficheroClave = file(project.findProperty('keystoreFile') ?: 'miscalorias.keystore')
     signingConfigs {
         release {
-            storeFile file("miscalorias.keystore")
-            storePassword "miscalorias"
-            keyAlias "miscalorias"
-            keyPassword "miscalorias"
+            if (ficheroClave.exists()) {
+                storeFile ficheroClave
+                storePassword project.findProperty('keystorePassword') ?: 'miscalorias'
+                keyAlias project.findProperty('keystoreAlias') ?: 'miscalorias'
+                keyPassword project.findProperty('keystorePassword') ?: 'miscalorias'
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            if (ficheroClave.exists()) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
