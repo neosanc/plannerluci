@@ -780,6 +780,8 @@ cargarAjustes();
 pintar();
 if(Nativo.enMovil()) Nativo.programar();
 
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+/* Dentro del APK los archivos ya están en el móvil: el service worker solo hace
+   falta en la versión web, y ahí además evita que se quede una copia vieja. */
+if("serviceWorker" in navigator && location.protocol.startsWith("http") && !Nativo.enMovil()){
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
