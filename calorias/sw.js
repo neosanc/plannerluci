@@ -1,8 +1,8 @@
 /* Guarda la app en el móvil para que funcione sin internet. */
-const CACHE = "misalud-v3";
+const CACHE = "misalud-v4";
 const ARCHIVOS = [
   "./", "./index.html", "./estilos.css", "./alimentos.js", "./app.js",
-  "./ingredientes.js", "./recetas.js", "./motor.js",
+  "./nutricion.js", "./ingredientes.js", "./recetas.js", "./motor.js",
   "./manifest.webmanifest", "./icono-192.png", "./icono-512.png"
 ];
 

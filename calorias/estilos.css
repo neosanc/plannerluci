@@ -262,3 +262,61 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--verde)}
   place-items:center;font-size:50px;margin:0 auto 16px;box-shadow:var(--sombra-color)}
 .celebra h3{font-size:22px;margin-bottom:6px}
 .celebra p{color:var(--suave);margin-bottom:20px}
+
+/* ---------- macros y micros ---------- */
+.macro, .micro{margin-bottom:13px}
+.macro-cab, .micro-cab{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.macro-cab b, .micro-cab b{font-size:15.5px;font-weight:700}
+.macro-cab span, .micro-cab span{margin-left:auto;font-size:14px;color:var(--suave);font-weight:600}
+.micro-cab i{font-style:normal;color:var(--verde);font-weight:800}
+.micro-cab i.malo{color:var(--rojo)}
+.barra{height:11px;border-radius:999px;background:#e9f0ec;overflow:hidden}
+.barra i{display:block;height:100%;border-radius:999px;background:var(--grad-principal)}
+.barra i.prot{background:linear-gradient(90deg,#0d9488,#2dd4bf)}
+.barra i.carb{background:linear-gradient(90deg,#65a30d,#a3e635)}
+.barra i.gras{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.barra i.micro{background:linear-gradient(90deg,#047857,#34d399)}
+.barra i.limite{background:linear-gradient(90deg,#0891b2,#22d3ee)}
+.barra i.malo{background:linear-gradient(90deg,#be123c,#fb7185)}
+.racion-caja{display:flex;align-items:center;gap:14px;background:var(--verde-claro);border-radius:16px;
+  padding:14px;margin-top:6px}
+.racion-caja b{font-size:30px;font-weight:800;color:var(--verde);letter-spacing:-1px}
+.racion-caja span{font-size:14px;color:#0f5132;line-height:1.3}
+
+/* ---------- añadir alimentos ---------- */
+.chips-cat{margin-top:10px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.chips-cat .chip{flex:none}
+.item .rapido{width:46px;align-self:stretch;font-size:24px;font-weight:800;color:var(--verde);flex:none;
+  border-left:1px solid var(--linea)}
+.contador{display:flex;align-items:center;gap:12px}
+.contador button{width:56px;height:56px;border-radius:18px;background:var(--verde-claro);color:var(--verde);
+  font-size:28px;font-weight:800;display:grid;place-items:center;flex:none}
+.contador input{text-align:center;font-size:24px;font-weight:800}
+
+/* ---------- fotos de los platos ---------- */
+.comida h2 .nombre-comida{flex:1;min-width:0}
+.comida h2 .nombre-comida i{display:block;font-style:normal;font-size:13px;color:var(--suave);
+  font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.foto-boton{font-size:19px;width:40px;height:40px;border-radius:12px;background:var(--verde-claro);
+  display:grid;place-items:center;flex:none}
+.marco-foto{position:relative}
+.marco-foto img{display:block;width:100%;max-height:220px;object-fit:cover}
+.marco-foto .quitar-foto{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;font-size:15px;display:grid;place-items:center}
+.marco-foto.pequeno img{width:64px;height:64px;border-radius:14px}
+
+/* ---------- menú semanal ---------- */
+.menu-dia.hoy{border:2px solid var(--verde)}
+.menu-cab{display:flex;align-items:baseline;margin-bottom:10px}
+.menu-cab b{font-size:17px}
+.menu-cab span{margin-left:auto;font-size:14px;color:var(--suave);font-weight:700}
+.menu-comida{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--linea)}
+.menu-comida .txt{flex:1;min-width:0}
+.menu-comida .txt b{display:block;font-size:13px;color:var(--verde);text-transform:uppercase;letter-spacing:.4px}
+.menu-comida .txt span{font-size:15.5px}
+.menu-comida .marco-foto:empty{display:none}
+
+/* ---------- leyenda del gráfico ---------- */
+.leyenda{display:flex;gap:16px;justify-content:center;font-size:13px;color:var(--suave);font-weight:600}
+.leyenda span{display:flex;align-items:center;gap:6px}
+.leyenda i{width:12px;height:12px;border-radius:4px;display:block}
