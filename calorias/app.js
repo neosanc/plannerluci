@@ -737,8 +737,11 @@ let semanaActual = lunesDe(hoyISO());
 function pintarMenu(){
   const fin = mover(semanaActual, 6);
   const mes = f => fecha(f).toLocaleDateString("es-CL", {month:"long"});
-  $("#menu-rango").textContent = "Del " + fecha(semanaActual).getDate() + " de " + mes(semanaActual) +
-    " al " + fecha(fin).getDate() + " de " + mes(fin);
+  const mismoMes = mes(semanaActual) === mes(fin);
+  $("#menu-rango").textContent = mismoMes
+    ? "Del " + fecha(semanaActual).getDate() + " al " + fecha(fin).getDate() + " de " + mes(fin)
+    : "Del " + fecha(semanaActual).getDate() + " de " + mes(semanaActual) +
+      " al " + fecha(fin).getDate() + " de " + mes(fin);
   $("#semana-despues").disabled = semanaActual >= lunesDe(hoyISO());
 
   let html = "";
