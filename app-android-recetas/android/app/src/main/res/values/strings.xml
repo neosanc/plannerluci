@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mis recetas</string>
+    <string name="title_activity_main">Mis recetas</string>
+    <string name="package_name">es.misrecetas.app</string>
+    <string name="custom_url_scheme">es.misrecetas.app</string>
+</resources>

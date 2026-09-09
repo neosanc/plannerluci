@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis recetas</title>
+<meta name="description" content="Dile lo que se te antoja y te da la receta con las cantidades y los productos del súper.">
+<meta name="theme-color" content="#f2f7f4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mis recetas">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<header id="cabecera"><b id="saludo">Hola</b><span id="subtitulo">¿Qué cocinamos hoy?</span></header>
+
+<main>
+  <!-- ============ BUSCAR ============ -->
+  <section id="vista-buscar">
+    <div class="buscador-caja">
+      <h1>Dime qué se te antoja</h1>
+      <p>Escríbelo como se te ocurra: «yogur con proteína, plátano y frutos secos» o «ensalada de atún».</p>
+      <textarea id="peticion" rows="3" placeholder="Ej. algo con pollo y brócoli para la cena"></textarea>
+      <button class="boton-buscar" id="buscar">Buscar receta</button>
+    </div>
+
+    <div id="resultados"></div>
+
+    <div class="tarjeta" id="sugerencias">
+      <div class="titulo">💡 O prueba con esto</div>
+      <div class="chips" id="chips-ideas"></div>
+    </div>
+  </section>
+
+  <!-- ============ RECETARIO ============ -->
+  <section id="vista-recetario" class="oculto">
+    <div class="tarjeta">
+      <div class="titulo">📖 Todas las recetas</div>
+      <div class="chips" id="chips-cat"></div>
+    </div>
+    <div id="lista-recetario"></div>
+  </section>
+
+  <!-- ============ GUARDADAS ============ -->
+  <section id="vista-guardadas" class="oculto">
+    <div id="lista-guardadas"></div>
+  </section>
+
+  <!-- ============ AJUSTES ============ -->
+  <section id="vista-ajustes" class="oculto">
+    <div class="tarjeta">
+      <div class="titulo">⚙️ Ajustes</div>
+      <label class="campo"><span>Nombre</span><input id="aj-nombre" type="text" placeholder="Gema"></label>
+      <label class="campo"><span>¿Para cuántas personas cocina normalmente?</span>
+        <input id="aj-porciones" type="number" inputmode="numeric" min="1" max="8">
+      </label>
+      <div class="interruptor"><b>Solo recetas sin carne ni pescado</b>
+        <button class="palanca" id="aj-vegetariano" aria-label="Vegetariano"></button>
+      </div>
+      <div class="nota">Con esto activado, el recetario esconde las de carne y las recetas inventadas usan huevo o legumbres.</div>
+    </div>
+    <div class="tarjeta">
+      <div class="titulo">💾 Copia de seguridad</div>
+      <div class="nota" style="margin:0 0 12px">Las recetas guardadas viven solo en este teléfono.</div>
+      <button class="boton gris" id="aj-exportar">Copiar mis guardadas</button>
+      <button class="boton gris" id="aj-importar">Pegar desde otro móvil</button>
+    </div>
+    <div class="nota" style="text-align:center;margin-bottom:10px" id="version-app"></div>
+  </section>
+</main>
+
+<nav>
+  <button data-vista="buscar" class="activa"><span class="i">🔎</span>Buscar</button>
+  <button data-vista="recetario"><span class="i">📖</span>Recetario</button>
+  <button data-vista="guardadas"><span class="i">❤️</span>Guardadas</button>
+  <button data-vista="ajustes"><span class="i">⚙️</span>Ajustes</button>
+</nav>
+
+<div id="hoja"></div>
+
+<script src="ingredientes.js"></script>
+<script src="recetas.js"></script>
+<script src="motor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

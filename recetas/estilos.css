@@ -1,0 +1,152 @@
+:root{
+  --fondo:#f2f7f4; --tarjeta:#fff; --texto:#12211a; --suave:#6b7d75; --linea:#e4ede8;
+  --verde:#059669; --verde-claro:#d1fae5; --lima:#84cc16; --ambar:#f59e0b; --rojo:#e11d48;
+  --grad-principal:linear-gradient(135deg,#047857 0%,#059669 45%,#34d399 100%);
+  --grad-lima:linear-gradient(135deg,#65a30d,#84cc16);
+  --sombra:0 2px 6px rgba(6,40,28,.05), 0 12px 28px rgba(6,40,28,.07);
+  --sombra-color:0 10px 26px rgba(5,150,105,.3);
+  --r:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  font-size:17px;line-height:1.45;color:var(--texto);
+  background:
+    radial-gradient(1100px 520px at 10% -8%, #d1fae5 0%, rgba(209,250,229,0) 62%),
+    radial-gradient(900px 520px at 95% 2%, #ecfccb 0%, rgba(236,252,203,0) 60%),
+    var(--fondo);
+  background-attachment:fixed;overscroll-behavior-y:none;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+.oculto{display:none!important}
+
+header{
+  position:sticky;top:0;z-index:20;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(242,247,244,.85);
+}
+header b{display:block;font-size:23px;letter-spacing:-.4px}
+header span{display:block;font-size:14px;color:var(--suave)}
+
+main{padding:6px 16px calc(104px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
+
+.tarjeta{background:var(--tarjeta);border-radius:var(--r);box-shadow:var(--sombra);padding:18px;margin-bottom:16px}
+.titulo{font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--suave);margin-bottom:12px}
+
+/* ---------- buscador ---------- */
+.buscador-caja{
+  position:relative;overflow:hidden;border-radius:26px;padding:20px 18px;margin-bottom:16px;
+  background:var(--grad-principal);color:#fff;box-shadow:var(--sombra-color)
+}
+.buscador-caja::after{
+  content:"";position:absolute;width:260px;height:260px;right:-100px;top:-130px;border-radius:50%;
+  background:rgba(255,255,255,.12)
+}
+.buscador-caja h1{font-size:21px;line-height:1.25;margin-bottom:4px;position:relative;z-index:1}
+.buscador-caja p{font-size:14.5px;opacity:.9;margin-bottom:14px;position:relative;z-index:1}
+.buscador-caja textarea{
+  width:100%;border:none;border-radius:16px;padding:14px;font-size:17px;resize:none;
+  background:rgba(255,255,255,.96);color:var(--texto);position:relative;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.08)
+}
+.buscador-caja textarea:focus{outline:3px solid rgba(255,255,255,.55)}
+.boton-buscar{
+  width:100%;margin-top:10px;padding:15px;border-radius:16px;background:#fff;color:var(--verde);
+  font-size:17px;font-weight:800;position:relative;z-index:1
+}
+
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{padding:11px 15px;border-radius:999px;background:var(--tarjeta);box-shadow:var(--sombra);font-size:15px;font-weight:600}
+.chip.sel{background:var(--grad-principal);color:#fff;box-shadow:var(--sombra-color)}
+.chip.clara{background:rgba(255,255,255,.22);color:#fff;box-shadow:none;font-weight:600}
+
+/* ---------- tarjetas de receta ---------- */
+.receta{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--tarjeta);
+  padding:14px;border-radius:18px;margin-bottom:10px;box-shadow:var(--sombra)
+}
+.receta .icono{
+  width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex:none;
+  background:var(--verde-claro)
+}
+.receta.inventada .icono{background:var(--grad-lima)}
+.receta .txt{flex:1;min-width:0}
+.receta .txt b{display:block;font-weight:700;line-height:1.25}
+.receta .txt span{font-size:13px;color:var(--suave)}
+.receta .flecha{color:#c3d3cb;font-size:22px}
+.etq{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:var(--verde-claro);color:var(--verde);margin:6px 6px 0 0}
+.etq.lima{background:#ecfccb;color:#4d7c0f}
+
+/* ---------- detalle ---------- */
+.hoja{position:fixed;inset:0;z-index:40;background:var(--fondo);display:flex;flex-direction:column;animation:sube .2s ease-out}
+@keyframes sube{from{transform:translateY(22px);opacity:.3}to{transform:none;opacity:1}}
+.hoja-cab{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;
+  background:var(--tarjeta);border-bottom:1px solid var(--linea)}
+.hoja-cab b{font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hoja-cab .cerrar{font-size:16px;font-weight:800;color:var(--verde);padding:8px}
+.hoja-cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
+
+.cabecera-receta{
+  border-radius:24px;padding:20px 18px;background:var(--grad-principal);color:#fff;
+  box-shadow:var(--sombra-color);margin-bottom:16px;position:relative;overflow:hidden
+}
+.cabecera-receta .emoji{font-size:44px;line-height:1}
+.cabecera-receta h2{font-size:23px;line-height:1.2;margin:6px 0 10px;letter-spacing:-.4px}
+.datos{display:flex;gap:8px}
+.datos div{flex:1;background:rgba(255,255,255,.17);border-radius:14px;padding:9px 6px;text-align:center}
+.datos b{display:block;font-size:18px;font-weight:800}
+.datos span{font-size:11px;text-transform:uppercase;letter-spacing:.4px;opacity:.85;font-weight:700}
+
+.porciones{display:flex;align-items:center;gap:12px}
+.porciones b{flex:1;font-size:16px}
+.porciones button{width:44px;height:44px;border-radius:14px;background:var(--verde-claro);color:var(--verde);
+  font-size:24px;font-weight:800;display:grid;place-items:center}
+.porciones .n{min-width:34px;text-align:center;font-size:20px;font-weight:800}
+
+.ingrediente{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--linea)}
+.ingrediente:first-child{border-top:none}
+.ingrediente .marca{width:9px;height:9px;border-radius:50%;background:var(--verde);margin-top:8px;flex:none}
+.ingrediente .txt{flex:1}
+.ingrediente .txt b{font-weight:600}
+.ingrediente .txt i{display:block;font-style:normal;font-size:13px;color:var(--suave);margin-top:2px}
+.ingrediente .cant{font-weight:800;white-space:nowrap;color:var(--verde)}
+
+.paso{display:flex;gap:13px;padding:11px 0}
+.paso .num{width:30px;height:30px;border-radius:50%;background:var(--grad-principal);color:#fff;
+  font-weight:800;font-size:15px;display:grid;place-items:center;flex:none}
+.consejo{background:#ecfccb;border-radius:16px;padding:14px;font-size:15px;color:#3f6212}
+.consejo b{display:block;margin-bottom:3px}
+
+.boton{display:block;width:100%;padding:16px;border-radius:17px;background:var(--grad-principal);color:#fff;
+  font-size:17px;font-weight:800;text-align:center;box-shadow:var(--sombra-color)}
+.boton.gris{background:#e8f0eb;color:var(--texto);box-shadow:none}
+.boton.roja{background:#ffe9ee;color:var(--rojo);box-shadow:none}
+.boton+.boton{margin-top:10px}
+
+label.campo{display:block;margin-bottom:14px}
+label.campo span{display:block;font-size:14px;color:var(--suave);margin-bottom:6px;font-weight:600}
+input,select{width:100%;padding:14px;border:2px solid var(--linea);border-radius:15px;background:#fafffc;font-size:17px}
+input:focus,select:focus{outline:none;border-color:var(--verde)}
+.interruptor{display:flex;align-items:center;gap:12px;padding:4px 0 10px}
+.interruptor b{flex:1;font-size:16px;font-weight:600}
+.palanca{width:56px;height:32px;border-radius:999px;background:#dbe5e0;position:relative;flex:none;transition:background .2s}
+.palanca::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.2);transition:transform .2s}
+.palanca.si{background:var(--verde)}
+.palanca.si::after{transform:translateX(24px)}
+.nota{font-size:13.5px;color:var(--suave);margin-top:10px}
+.vacio{text-align:center;color:var(--suave);padding:26px 12px;font-size:15px}
+.vacio .em{font-size:40px;display:block;margin-bottom:8px}
+
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--linea);
+  padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;padding:10px 0 11px;color:#8fa39a;font-size:11.5px;font-weight:700;display:grid;gap:3px;justify-items:center}
+nav button .i{font-size:22px;line-height:1;filter:grayscale(1);opacity:.55}
+nav button.activa{color:var(--verde)}
+nav button.activa .i{filter:none;opacity:1}
+
+.aviso{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:#12211a;color:#fff;padding:13px 20px;border-radius:999px;font-size:15px;z-index:60;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);max-width:90vw;text-align:center;animation:sube .18s ease-out}

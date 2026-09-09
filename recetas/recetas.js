@@ -1,0 +1,327 @@
+/* Recetario. Las cantidades son POR PORCIÓN, en la unidad de cada ingrediente.
+   Las calorías y la proteína se calculan solas a partir de ingredientes.js. */
+
+const RECETAS = [
+  // ---------------- desayuno y once ----------------
+  {id:"bowl-yogur-proteico", n:"Bowl de yogur proteico con plátano y frutos secos", e:"🥣",
+   cat:"desayuno", t:5, etiquetas:["alto en proteína","sin cocción","rápido"],
+   claves:["yogur","proteina","platano","frutos secos","nueces","almendras","bowl","avena"],
+   ing:[["yogur-griego",170],["platano",1],["nueces",15],["almendras",10],["avena",30],["chia",1],["miel",1]],
+   pasos:[
+     "Pon el yogur en un bowl hondo.",
+     "Corta el plátano en rodajas y repártelo por encima.",
+     "Pica las nueces y las almendras a cuchillo y espolvoréalas.",
+     "Termina con la avena, la chía y un hilo de miel."],
+   tip:"Si lo dejas tapado en el refrigerador toda la noche, la avena se ablanda y queda como un pudín."},
+
+  {id:"yogur-frutillas-granola", n:"Yogur con frutillas y granola", e:"🍓",
+   cat:"once", t:5, etiquetas:["sin cocción","rápido"],
+   claves:["yogur","frutilla","granola","fruta","once"],
+   ing:[["yogur-natural",170],["frutilla",120],["granola",40],["miel",1]],
+   pasos:[
+     "Lava y corta las frutillas en cuartos.",
+     "Alterna en un vaso: yogur, frutillas, granola, y repite.",
+     "Endulza con la miel justo antes de comer para que la granola siga crujiente."],
+   tip:"Con arándanos congelados queda igual de rico y sale más barato fuera de temporada."},
+
+  {id:"avena-manzana", n:"Avena cocida con manzana y canela", e:"🥄",
+   cat:"desayuno", t:10, etiquetas:["económico","abrigadora"],
+   claves:["avena","manzana","canela","leche","desayuno"],
+   ing:[["avena",50],["leche",200],["manzana",1],["nueces",15],["miel",1]],
+   pasos:[
+     "Ralla o pica la manzana en cubitos chicos.",
+     "Calienta la leche con la avena a fuego medio, revolviendo, unos 5 minutos.",
+     "Agrega la manzana y una pizca de canela, y cocina 2 minutos más.",
+     "Sirve con las nueces picadas y la miel."],
+   tip:"Si la quieres más espesa, deja un minuto más al fuego; se espesa sola al enfriar."},
+
+  {id:"tostadas-palta-huevo", n:"Tostadas de palta con huevo", e:"🥑",
+   cat:"desayuno", t:10, etiquetas:["alto en proteína","rápido"],
+   claves:["palta","huevo","pan","tostada","desayuno"],
+   ing:[["pan-integral",2],["palta",0.5],["huevo",2],["limon",0.25],["merken",0.5],["sal",1]],
+   pasos:[
+     "Tuesta el pan.",
+     "Muele la palta con un tenedor, con el jugo de limón y una pizca de sal.",
+     "Cocina los huevos como más te gusten: revueltos, a la copa o pochados.",
+     "Unta la palta en el pan, pon el huevo encima y espolvorea el merkén."],
+   tip:"El limón no es capricho: evita que la palta se ponga negra."},
+
+  {id:"revuelto-quesillo", n:"Huevos revueltos con quesillo y tomate", e:"🍳",
+   cat:"desayuno", t:10, etiquetas:["alto en proteína","rápido"],
+   claves:["huevo","revuelto","quesillo","queso","tomate"],
+   ing:[["huevo",2],["quesillo",60],["tomate",1],["cilantro",1],["aceite-oliva",0.5],["sal",1]],
+   pasos:[
+     "Pica el tomate en cubos y desmenuza el quesillo con las manos.",
+     "Bate los huevos con una pizca de sal.",
+     "Calienta el aceite en un sartén a fuego suave y echa los huevos, revolviendo despacio.",
+     "Cuando estén casi listos, agrega el tomate y el quesillo, y apaga el fuego.",
+     "Termina con el cilantro picado."],
+   tip:"Fuego bajo y paciencia: los huevos revueltos se arruinan con el fuego fuerte."},
+
+  {id:"batido-platano-mani", n:"Batido de plátano y maní", e:"🥤",
+   cat:"once", t:5, etiquetas:["alto en proteína","sin cocción","rápido"],
+   claves:["batido","licuado","platano","mani","leche","proteina"],
+   ing:[["leche",250],["platano",1],["mantequilla-mani",1],["avena",20],["chia",1]],
+   pasos:[
+     "Pon todo en la juguera.",
+     "Licúa un minuto, hasta que no queden grumos de avena.",
+     "Sirve al momento, con hielo si hace calor."],
+   tip:"Con el plátano congelado en rodajas queda cremoso, como un helado."},
+
+  {id:"panqueques-avena", n:"Panqueques de avena y plátano", e:"🥞",
+   cat:"desayuno", t:15, etiquetas:["alto en proteína","económico"],
+   claves:["panqueque","panqueques","avena","platano","huevo"],
+   ing:[["avena",50],["huevo",2],["platano",1],["miel",1]],
+   pasos:[
+     "Muele el plátano con el tenedor y mézclalo con los huevos y la avena.",
+     "Deja reposar la mezcla 5 minutos para que la avena se hidrate.",
+     "Cocina cucharadas de mezcla en un sartén antiadherente a fuego medio, 2 minutos por lado.",
+     "Sirve con la miel y, si quieres, fruta encima."],
+   tip:"Dan 3 o 4 panqueques chicos por porción. Se pueden congelar."},
+
+  // ---------------- almuerzo y cena ----------------
+  {id:"ensalada-atun-chilena", n:"Ensalada de atún a la chilena", e:"🥗",
+   cat:"almuerzo", t:10, etiquetas:["alto en proteína","sin cocción","rápido","económico"],
+   claves:["ensalada","atun","tomate","cebolla","palta","chilena"],
+   ing:[["atun-agua",120],["tomate",1],["cebolla",0.5],["palta",0.5],["limon",0.5],
+        ["aceite-oliva",1],["cilantro",1],["sal",1]],
+   pasos:[
+     "Corta la cebolla en pluma fina y déjala 10 minutos en agua fría con sal para que no repita.",
+     "Pica el tomate en gajos y la palta en cubos.",
+     "Escurre bien el atún y desmenúzalo.",
+     "Mezcla todo con el jugo de limón, el aceite y una pizca de sal.",
+     "Termina con el cilantro picado."],
+   tip:"El atún al agua tiene la mitad de calorías que el de aceite y sabe igual en ensalada."},
+
+  {id:"ensalada-atun-porotos", n:"Ensalada de atún con porotos y choclo", e:"🫘",
+   cat:"almuerzo", t:15, etiquetas:["alto en proteína","económico","abundante"],
+   claves:["ensalada","atun","porotos","choclo","legumbre"],
+   ing:[["atun-agua",120],["porotos",150],["choclo",100],["cebolla",0.5],["pimenton",0.5],
+        ["aceite-oliva",1],["limon",0.5],["perejil",1],["sal",1]],
+   pasos:[
+     "Si usas porotos de conserva, enjuágalos bien bajo el agua.",
+     "Pica la cebolla y el pimentón en cubitos chicos.",
+     "Mezcla los porotos, el choclo, las verduras y el atún escurrido.",
+     "Aliña con aceite, limón, sal y perejil picado, y deja reposar 10 minutos antes de servir."],
+   tip:"Aguanta bien en el refrigerador: sirve para llevar al día siguiente."},
+
+  {id:"ensalada-quinoa-palta", n:"Ensalada de quinoa con palta y quesillo", e:"🥑",
+   cat:"almuerzo", t:20, etiquetas:["vegetariano","alto en proteína"],
+   claves:["quinoa","ensalada","palta","quesillo","vegetariano"],
+   ing:[["quinoa",150],["palta",0.5],["quesillo",60],["tomate",1],["espinaca",60],
+        ["aceite-oliva",1],["limon",0.5],["sal",1]],
+   pasos:[
+     "Lava la quinoa frotándola bajo el agua hasta que no salga espuma; así no amarga.",
+     "Cocínala 15 minutos en el doble de agua y déjala enfriar.",
+     "Pica el tomate, la palta y el quesillo en cubos y corta la espinaca en tiras.",
+     "Mezcla todo y aliña con aceite, limón y sal."],
+   tip:"Cocina quinoa para tres días de una vez; en el refrigerador dura bien."},
+
+  {id:"pollo-jugo-arroz", n:"Pollo al jugo con arroz", e:"🍗",
+   cat:"almuerzo", t:35, etiquetas:["alto en proteína","de olla"],
+   claves:["pollo","arroz","jugo","almuerzo"],
+   ing:[["pollo-pechuga",150],["cebolla",0.5],["ajo",1],["caldo",150],["arroz",150],
+        ["aji-color",0.5],["comino",0.5],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Corta el pollo en trozos grandes y dóralos en la olla con el aceite.",
+     "Saca el pollo y en la misma olla sofríe la cebolla picada y el ajo.",
+     "Agrega el ají de color y el comino, revuelve, y devuelve el pollo.",
+     "Echa el caldo, tapa y cocina a fuego suave 20 minutos.",
+     "Sirve con el arroz graneado."],
+   tip:"Si el jugo queda muy líquido, destapa los últimos 5 minutos."},
+
+  {id:"pollo-salteado-verduras", n:"Salteado de pollo con verduras y quinoa", e:"🥦",
+   cat:"cena", t:25, etiquetas:["alto en proteína","rápido"],
+   claves:["pollo","salteado","verduras","brocoli","quinoa","cena"],
+   ing:[["pollo-pechuga",150],["brocoli",120],["pimenton",0.5],["zanahoria",1],["ajo",1],
+        ["aceite-oliva",1],["quinoa",120],["sal",1]],
+   pasos:[
+     "Corta el pollo en tiras y las verduras en trozos parejos.",
+     "Calienta bien el sartén con el aceite y sella el pollo 4 minutos.",
+     "Agrega el ajo y las verduras y saltea 5 minutos más: tienen que quedar firmes.",
+     "Sirve sobre la quinoa cocida."],
+   tip:"El sartén tiene que estar caliente antes de echar nada, si no las verduras sueltan agua y se cuecen."},
+
+  {id:"cazuela-pollo", n:"Cazuela de pollo", e:"🍲",
+   cat:"almuerzo", t:50, etiquetas:["chileno","de olla","abrigadora"],
+   claves:["cazuela","pollo","sopa","caldo","chileno"],
+   ing:[["pollo-trutro",180],["papa",200],["zapallo",150],["choclo",100],["poroto-verde",60],
+        ["zanahoria",1],["caldo",400],["cilantro",1],["sal",1]],
+   pasos:[
+     "Pon el pollo en la olla con el caldo y agua hasta cubrir, y cocina 20 minutos sacando la espuma.",
+     "Agrega la papa entera, el zapallo y la zanahoria en trozos grandes.",
+     "A los 15 minutos suma el choclo y los porotos verdes.",
+     "Cocina 10 minutos más, prueba de sal y sirve con cilantro picado encima."],
+   tip:"La papa entera es lo que espesa el caldo; no la piques chica."},
+
+  {id:"charquican", n:"Charquicán liviano", e:"🥘",
+   cat:"almuerzo", t:40, etiquetas:["chileno","económico","de olla"],
+   claves:["charquican","zapallo","papa","carne","chileno"],
+   ing:[["carne-molida",100],["zapallo",200],["papa",150],["choclo",80],["cebolla",0.5],
+        ["ajo",1],["aji-color",0.5],["comino",0.5],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Sofríe la cebolla y el ajo picados en el aceite, y agrega la carne hasta que se dore.",
+     "Suma el ají de color y el comino y revuelve 30 segundos.",
+     "Agrega el zapallo y la papa en cubos y agua justo hasta cubrir.",
+     "Cocina 25 minutos tapado y muele con el uslero o un tenedor hasta que quede rústico.",
+     "Agrega el choclo al final y prueba de sal."],
+   tip:"Clásico con un huevo frito encima; suma unas 90 calorías."},
+
+  {id:"tomatican", n:"Tomaticán", e:"🍅",
+   cat:"almuerzo", t:35, etiquetas:["chileno","de olla","económico"],
+   claves:["tomatican","tomate","choclo","carne","chileno"],
+   ing:[["carne-molida",120],["tomate",2],["choclo",100],["cebolla",0.5],["papa",150],
+        ["oregano",0.5],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Pela los tomates (déjalos 1 minuto en agua hirviendo y salen solos) y pícalos.",
+     "Sofríe la cebolla, agrega la carne y dórala.",
+     "Suma el tomate, el orégano y una pizca de sal, y cocina 10 minutos a fuego suave.",
+     "Agrega la papa en cubos y el choclo, y cocina 15 minutos más."],
+   tip:"En verano, con tomate limachino de la feria, no necesita nada más."},
+
+  {id:"tortilla-zapallo", n:"Tortilla de zapallo italiano", e:"🍳",
+   cat:"cena", t:25, etiquetas:["vegetariano","económico"],
+   claves:["tortilla","zapallo","italiano","huevo","vegetariano"],
+   ing:[["zapallo-italiano",1],["huevo",3],["cebolla",0.5],["queso-mantecoso",20],
+        ["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Ralla el zapallo, ponle sal y déjalo 10 minutos en un colador; después apriétalo para sacarle el agua.",
+     "Sofríe la cebolla picada hasta que esté transparente.",
+     "Bate los huevos, mezcla con el zapallo, la cebolla y el queso rallado.",
+     "Cocina en el sartén a fuego bajo 6 minutos por lado, dándola vuelta con la ayuda de un plato."],
+   tip:"El paso de sacarle el agua al zapallo es el que decide si la tortilla queda firme o aguada."},
+
+  {id:"merluza-pure", n:"Merluza a la plancha con puré", e:"🐟",
+   cat:"cena", t:30, etiquetas:["alto en proteína","liviano"],
+   claves:["merluza","pescado","pure","papa","cena"],
+   ing:[["merluza",180],["papa",250],["leche",50],["mantequilla",1],["limon",0.5],
+        ["lechuga",60],["sal",1]],
+   pasos:[
+     "Cuece las papas peladas en agua con sal, 20 minutos.",
+     "Muélelas con la leche caliente y la mantequilla, sin batir mucho.",
+     "Seca bien el filete con papel y cocínalo 3 minutos por lado en un sartén caliente.",
+     "Sirve con el jugo de limón y una ensalada de lechuga."],
+   tip:"El pescado seco por fuera es lo único que hace que se dore en vez de hervirse."},
+
+  {id:"salmon-horno", n:"Salmón al horno con papas", e:"🐠",
+   cat:"cena", t:35, etiquetas:["alto en proteína"],
+   claves:["salmon","pescado","horno","papa","brocoli"],
+   ing:[["salmon",150],["papa",200],["brocoli",120],["limon",0.5],["aceite-oliva",1],
+        ["oregano",0.5],["sal",1]],
+   pasos:[
+     "Precalienta el horno a 200 °C.",
+     "Corta las papas en rodajas finas, alíñalas con aceite, sal y orégano, y hornéalas 20 minutos.",
+     "Pon el salmón encima de las papas y hornea 12 minutos más.",
+     "Cocina el brócoli al vapor 5 minutos y sirve todo con limón."],
+   tip:"El salmón está listo cuando se separa en láminas con el tenedor; si lo pasas, queda seco."},
+
+  {id:"lentejas-arroz", n:"Lentejas guisadas con arroz", e:"🍛",
+   cat:"almuerzo", t:45, etiquetas:["vegetariano","económico","de olla"],
+   claves:["lentejas","legumbre","arroz","guiso","vegetariano"],
+   ing:[["lentejas",200],["arroz",100],["cebolla",0.5],["zanahoria",1],["ajo",1],
+        ["aji-color",0.5],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Sofríe la cebolla, el ajo y la zanahoria picados en el aceite.",
+     "Agrega el ají de color, revuelve y suma las lentejas remojadas con agua hasta cubrirlas dos dedos.",
+     "Cocina 30 minutos a fuego suave, agregando agua caliente si se secan.",
+     "Sirve con el arroz al lado y sal al final (si la echas antes, la lenteja queda dura)."],
+   tip:"Un chorrito de vinagre al servir levanta todo el plato."},
+
+  {id:"porotos-riendas", n:"Porotos con riendas", e:"🍝",
+   cat:"almuerzo", t:45, etiquetas:["chileno","económico","abundante"],
+   claves:["porotos","riendas","fideos","legumbre","chileno"],
+   ing:[["porotos",200],["fideos",60],["zapallo",100],["cebolla",0.5],["ajo",1],
+        ["aji-color",0.5],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Cuece los porotos con el zapallo en trozos hasta que estén blandos (o usa de conserva).",
+     "Aparte, sofríe la cebolla y el ajo con el ají de color.",
+     "Junta el sofrito con los porotos, agrega agua caliente si hace falta y deja hervir suave.",
+     "Echa los fideos y cocina hasta que estén listos, revolviendo para que no se peguen."],
+   tip:"Los espaguetis se parten en tres: eso son las riendas."},
+
+  {id:"wrap-pollo-palta", n:"Wrap de pollo y palta", e:"🌯",
+   cat:"cena", t:15, etiquetas:["alto en proteína","rápido","para llevar"],
+   claves:["wrap","pita","pollo","palta","sandwich"],
+   ing:[["pan-pita",1],["pollo-pechuga",120],["palta",0.5],["lechuga",40],["tomate",0.5],
+        ["mayo-light",1],["sal",1]],
+   pasos:[
+     "Cocina el pollo a la plancha con sal y córtalo en tiras.",
+     "Entibia el pan pita 20 segundos por lado en el sartén para que no se quiebre.",
+     "Unta la palta molida y la mayonesa, y arma con el pollo, la lechuga y el tomate.",
+     "Enrolla apretado y córtalo por la mitad."],
+   tip:"Si es para llevar, envuélvelo en papel para que no se abra."},
+
+  {id:"sandwich-jamon-quesillo", n:"Sándwich de pavo, quesillo y palta", e:"🥪",
+   cat:"once", t:10, etiquetas:["rápido","alto en proteína"],
+   claves:["sandwich","marraqueta","pavo","jamon","quesillo","palta","once"],
+   ing:[["marraqueta",1],["jamon-pavo",60],["quesillo",40],["tomate",0.5],["palta",0.25],["sal",1]],
+   pasos:[
+     "Abre la marraqueta y sácale un poco de miga si la quieres más liviana.",
+     "Unta la palta molida con una pizca de sal.",
+     "Arma con el pavo, el quesillo en láminas y el tomate en rodajas."],
+   tip:"Con la marraqueta tostada aguanta mejor la palta y no se humedece."},
+
+  {id:"sopa-verduras-pollo", n:"Sopa de verduras con pollo", e:"🥣",
+   cat:"cena", t:30, etiquetas:["liviano","abrigadora","económico"],
+   claves:["sopa","verduras","pollo","caldo","cena"],
+   ing:[["pollo-pechuga",100],["zanahoria",1],["apio",60],["zapallo-italiano",0.5],
+        ["papa",150],["caldo",500],["cilantro",1],["sal",1]],
+   pasos:[
+     "Pica todas las verduras en cubos parejos.",
+     "Hierve el caldo y echa la papa y la zanahoria; cocina 10 minutos.",
+     "Agrega el pollo en cubos, el apio y el zapallo, y cocina 10 minutos más.",
+     "Prueba de sal y sirve con cilantro."],
+   tip:"Doblando la receta, la del día siguiente sabe mejor."},
+
+  {id:"arroz-primavera", n:"Arroz primavera con huevo", e:"🍚",
+   cat:"almuerzo", t:25, etiquetas:["vegetariano","económico","rápido"],
+   claves:["arroz","huevo","verduras","choclo","vegetariano"],
+   ing:[["arroz",150],["huevo",2],["choclo",80],["poroto-verde",80],["zanahoria",1],
+        ["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Cocina el arroz como siempre.",
+     "Saltea la zanahoria en cubitos y los porotos verdes 5 minutos.",
+     "Agrega el choclo y el arroz cocido, y revuelve todo junto.",
+     "Haz los huevos revueltos aparte y mézclalos al final."],
+   tip:"Sirve muy bien para aprovechar arroz del día anterior."},
+
+  // ---------------- snacks ----------------
+  {id:"ensalada-chilena", n:"Ensalada chilena", e:"🍅",
+   cat:"snack", t:10, etiquetas:["chileno","sin cocción","vegetariano","rápido"],
+   claves:["ensalada","chilena","tomate","cebolla","acompañamiento"],
+   ing:[["tomate",2],["cebolla",0.5],["cilantro",1],["aceite-oliva",1],["sal",1]],
+   pasos:[
+     "Corta la cebolla en pluma y déjala en agua fría con sal 10 minutos; después escúrrela.",
+     "Corta el tomate en gajos.",
+     "Mezcla, aliña con aceite y sal, y termina con cilantro."],
+   tip:"Va con casi todo: pollo, pescado, porotos o un asado."},
+
+  {id:"palta-quesillo-galletas", n:"Galletas de arroz con palta y quesillo", e:"🥑",
+   cat:"snack", t:5, etiquetas:["sin cocción","rápido","alto en proteína"],
+   claves:["snack","palta","quesillo","galleta","arroz"],
+   ing:[["galleta-arroz",3],["palta",0.5],["quesillo",40],["merken",0.5],["sal",1]],
+   pasos:[
+     "Muele la palta con una pizca de sal.",
+     "Úntala en las galletas y pon el quesillo desmenuzado encima.",
+     "Espolvorea merkén."],
+   tip:"Snack de media tarde que quita el hambre sin dejar pesado."},
+
+  {id:"manzana-mani", n:"Manzana con mantequilla de maní", e:"🍎",
+   cat:"snack", t:3, etiquetas:["sin cocción","rápido"],
+   claves:["snack","manzana","mani","fruta"],
+   ing:[["manzana",1],["mantequilla-mani",1]],
+   pasos:[
+     "Corta la manzana en gajos.",
+     "Sirve con la mantequilla de maní al lado para ir mojando."],
+   tip:"Busca la que solo trae maní y sal en los ingredientes."},
+
+  {id:"huevos-duros-merken", n:"Huevos duros con merkén", e:"🥚",
+   cat:"snack", t:12, etiquetas:["alto en proteína","económico"],
+   claves:["huevo","duro","snack","proteina","merken"],
+   ing:[["huevo",2],["merken",0.5],["sal",1]],
+   pasos:[
+     "Pon los huevos en agua fría, lleva a hervor y cuenta 9 minutos.",
+     "Pásalos a agua con hielo: así se pelan sin pelearse.",
+     "Córtalos por la mitad y espolvorea sal y merkén."],
+   tip:"Cocidos duran 3 días en el refrigerador, con cáscara."}
+];
