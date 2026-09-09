@@ -1,8 +1,0 @@
-{
-  "appId": "es.misrecetas.app",
-  "appName": "Mis recetas",
-  "webDir": "www",
-  "android": {
-    "allowMixedContent": false
-  }
-}

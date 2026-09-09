@@ -1,7 +1,7 @@
-name: Construir los APK
+name: Construir el APK de Mi salud
 
 # Se puede lanzar a mano desde la pestaña Actions, y se lanza solo
-# cada vez que cambia alguna de las dos apps.
+# cada vez que cambia la app.
 on:
   workflow_dispatch:
   push:
@@ -10,9 +10,7 @@ on:
       - claude/calorie-counter-android-app-j65yn6
     paths:
       - 'calorias/**'
-      - 'recetas/**'
       - 'app-android/**'
-      - 'app-android-recetas/**'
       - '.github/workflows/apk.yml'
 
 jobs:
@@ -21,23 +19,6 @@ jobs:
     permissions:
       contents: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - app: calorias
-            proyecto: app-android
-            archivo: mis-calorias
-            etiqueta: apk
-            titulo: "Mis calorías — última versión"
-          - app: recetas
-            proyecto: app-android-recetas
-            archivo: mis-recetas
-            etiqueta: apk-recetas
-            titulo: "Mis recetas — última versión"
-
-    name: APK de ${{ matrix.app }}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +26,7 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-          cache-dependency-path: ${{ matrix.proyecto }}/package-lock.json
+          cache-dependency-path: app-android/package-lock.json
 
       - uses: actions/setup-java@v4
         with:
@@ -65,7 +46,7 @@ jobs:
         env:
           CLAVE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
         run: |
-          DESTINO=${{ matrix.proyecto }}/android/app/miscalorias.keystore
+          DESTINO=app-android/android/app/miscalorias.keystore
           if [ -n "$CLAVE_B64" ]; then
             echo "$CLAVE_B64" | base64 -d > "$DESTINO"
             echo "propia=si" >> "$GITHUB_OUTPUT"
@@ -74,69 +55,70 @@ jobs:
             keytool -genkeypair -keystore "$DESTINO" -alias miscalorias \
               -keyalg RSA -keysize 2048 -validity 10000 \
               -storepass miscalorias -keypass miscalorias \
-              -dname "CN=Mis apps, OU=Familia, O=Personal, C=CL"
+              -dname "CN=Mi salud, OU=Familia, O=Personal, C=CL"
             base64 -w0 "$DESTINO" > clave-para-el-secreto.txt
             echo "propia=no" >> "$GITHUB_OUTPUT"
             echo "Firmando con una clave temporal (ver el aviso al final del resumen)."
           fi
 
       - name: Instalar dependencias
-        working-directory: ${{ matrix.proyecto }}
+        working-directory: app-android
         run: npm ci
 
       - name: Meter la app web dentro del proyecto Android
-        working-directory: ${{ matrix.proyecto }}
+        working-directory: app-android
         run: npm run sync
 
       - name: Compilar el APK firmado
-        working-directory: ${{ matrix.proyecto }}/android
+        working-directory: app-android/android
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon \
             -PappVersionCode=${{ github.run_number }} \
-            -PappVersionName=2.0.${{ github.run_number }}
+            -PappVersionName=3.0.${{ github.run_number }}
 
       - name: Preparar el archivo para descargar
         run: |
           mkdir -p salida
-          cp ${{ matrix.proyecto }}/android/app/build/outputs/apk/release/app-release.apk \
-             salida/${{ matrix.archivo }}.apk
+          cp app-android/android/app/build/outputs/apk/release/app-release.apk salida/mi-salud.apk
           ls -la salida
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.archivo }}-apk
-          path: salida/${{ matrix.archivo }}.apk
+          name: mi-salud-apk
+          path: salida/mi-salud.apk
 
       # Solo la primera vez: deja a mano el texto de la clave para guardarlo como secreto.
       - name: Guardar la clave generada
         if: steps.clave.outputs.propia == 'no'
         uses: actions/upload-artifact@v4
         with:
-          name: clave-de-firma-${{ matrix.app }}
+          name: clave-de-firma
           path: clave-para-el-secreto.txt
           retention-days: 7
 
-      # Cada app tiene su propia release fija, para que el enlace de descarga
-      # sea siempre el mismo y se pueda abrir desde el móvil.
+      # Se publica siempre en la misma release, para que el enlace de descarga
+      # no cambie nunca y se pueda abrir desde el móvil.
       - name: Publicar el APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete ${{ matrix.etiqueta }} --yes --cleanup-tag || true
-          gh release create ${{ matrix.etiqueta }} salida/${{ matrix.archivo }}.apk \
-            --title "${{ matrix.titulo }}" \
-            --notes "APK para instalar en Android. Descárgalo desde el móvil y ábrelo. Versión 2.0.${{ github.run_number }}."
+          gh release delete apk --yes --cleanup-tag || true
+          gh release create apk salida/mi-salud.apk \
+            --title "Mi salud — última versión" \
+            --notes "APK para instalar en Android. Descárgalo desde el móvil y ábrelo. Versión 3.0.${{ github.run_number }}."
+          # la app de recetas ya vive dentro de esta, así que su release antigua sobra
+          gh release delete apk-recetas --yes --cleanup-tag || true
 
       - name: Resumen
         run: |
-          echo "### APK de ${{ matrix.app }} listo :iphone:" >> "$GITHUB_STEP_SUMMARY"
+          echo "### APK listo :iphone:" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Descarga desde el móvil: https://github.com/${{ github.repository }}/releases/download/${{ matrix.etiqueta }}/${{ matrix.archivo }}.apk" >> "$GITHUB_STEP_SUMMARY"
+          echo "Descarga desde el móvil: https://github.com/${{ github.repository }}/releases/download/apk/mi-salud.apk" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.clave.outputs.propia }}" = "no" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "> **Aviso**: esta versión va firmada con una clave temporal, así que la próxima no se podrá instalar encima." >> "$GITHUB_STEP_SUMMARY"
-            echo "> Para arreglarlo: descarga el artefacto \`clave-de-firma-${{ matrix.app }}\` de esta misma página, abre el archivo," >> "$GITHUB_STEP_SUMMARY"
+            echo "> Para arreglarlo: descarga el artefacto \`clave-de-firma\` de esta misma página, abre el archivo," >> "$GITHUB_STEP_SUMMARY"
             echo "> copia todo el texto y guárdalo en **Settings → Secrets and variables → Actions → New repository secret**" >> "$GITHUB_STEP_SUMMARY"
             echo "> con el nombre \`ANDROID_KEYSTORE_B64\`. A partir de ahí, todas las versiones se instalan una encima de otra." >> "$GITHUB_STEP_SUMMARY"
           fi

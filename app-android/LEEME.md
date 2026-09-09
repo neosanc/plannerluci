@@ -1,6 +1,6 @@
-# Envoltorio Android de «Mis calorías»
+# Envoltorio Android de «Mi salud»
 
-Esto convierte la app web de `../calorias` en una aplicación de Android de verdad
+Esto convierte la app web de `../calorias` (calorías, recetas y medidas) en una aplicación de Android de verdad
 (un APK que se instala en el móvil), usando [Capacitor](https://capacitorjs.com).
 
 La app web se copia tal cual dentro del APK, así que **hay una sola app**: lo que se

@@ -1,6 +1,6 @@
 {
   "appId": "es.miscalorias.app",
-  "appName": "Mis calorías",
+  "appName": "Mi salud",
   "webDir": "www",
   "android": {
     "allowMixedContent": false

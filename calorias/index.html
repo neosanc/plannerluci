@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mis calorías</title>
-<meta name="description" content="Contador de calorías sencillo, en español, sin registro.">
-<meta name="theme-color" content="#f5f6fb">
+<title>Mi salud</title>
+<meta name="description" content="Calorías del día, recetas con productos chilenos y control de peso, cintura e IMC.">
+<meta name="theme-color" content="#f2f7f4">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icono-192.png">
 <link rel="apple-touch-icon" href="icono-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mis calorías">
+<meta name="apple-mobile-web-app-title" content="Mi salud">
 <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
@@ -33,31 +33,22 @@
 <main>
   <!-- ============ HOY ============ -->
   <section id="vista-hoy">
-    <div class="hero">
+    <div class="hero" id="hero">
       <div class="anillo-caja">
         <svg width="208" height="208" viewBox="0 0 208 208" aria-hidden="true">
-          <defs>
-            <linearGradient id="grad-anillo" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ffffff"></stop>
-              <stop offset="100%" stop-color="#a7f3d0"></stop>
-            </linearGradient>
-            <linearGradient id="grad-anillo-pasado" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fde68a"></stop>
-              <stop offset="100%" stop-color="#fb7185"></stop>
-            </linearGradient>
-          </defs>
           <circle cx="104" cy="104" r="86" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="16"></circle>
-          <circle id="anillo-progreso" cx="104" cy="104" r="86" fill="none" stroke="url(#grad-anillo)"
-                  stroke-width="16" stroke-linecap="round" stroke-dasharray="541" stroke-dashoffset="541"></circle>
+          <circle id="anillo-progreso" cx="104" cy="104" r="86" fill="none" stroke="#fff"
+                  stroke-width="16" stroke-linecap="round" stroke-dasharray="541" stroke-dashoffset="0"></circle>
         </svg>
         <div class="centro">
-          <div class="grande"><span id="kcal-comidas">0</span><small> kcal</small></div>
-          <div class="restante" id="kcal-restantes"></div>
+          <div class="rotulo" id="rotulo-hero">Te quedan</div>
+          <div class="grande"><span id="kcal-restantes">0</span><small> kcal</small></div>
+          <div class="restante" id="kcal-comidas"></div>
         </div>
       </div>
       <div class="mini">
-        <div><b id="mini-objetivo">0</b><span>Objetivo</span></div>
-        <div><b id="mini-porcentaje">0 %</b><span>Llevas</span></div>
+        <div><b id="mini-objetivo">1500</b><span>Tope del día</span></div>
+        <div><b id="mini-comido">0</b><span>Comido</span></div>
         <div><b id="mini-agua">0/8</b><span>Agua</span></div>
       </div>
     </div>
@@ -73,21 +64,44 @@
     <div id="comidas"></div>
   </section>
 
+  <!-- ============ RECETAS ============ -->
+  <section id="vista-recetas" class="oculto">
+    <div class="buscador-caja">
+      <h1>Dime qué se te antoja</h1>
+      <p>Escríbelo como quieras: «yogur con proteína, plátano y frutos secos» o «ensalada de atún».</p>
+      <textarea id="peticion" rows="3" placeholder="Ej. algo con pollo y brócoli para la cena"></textarea>
+      <button class="boton-buscar" id="buscar-receta">Buscar receta</button>
+    </div>
+    <div class="chips" id="chips-recetas" style="margin-bottom:14px"></div>
+    <div id="resultados-recetas"></div>
+  </section>
+
   <!-- ============ PROGRESO ============ -->
   <section id="vista-progreso" class="oculto">
     <div class="tarjeta">
-      <div class="titulo">⚖️ Peso</div>
-      <div id="peso-resumen"></div>
-      <svg class="grafico" id="peso-grafico" viewBox="0 0 320 170"></svg>
-    </div>
-    <div class="tarjeta">
-      <div class="titulo">Apuntar el peso de hoy</div>
+      <div class="titulo">📏 Apuntar de hoy</div>
       <div class="fila">
-        <input id="peso-entrada" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 68,5">
-        <button class="boton" id="peso-guardar" style="flex:0 0 120px">Guardar</button>
+        <label class="campo"><span>Peso (kg)</span>
+          <input id="med-peso" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 68,5"></label>
+        <label class="campo"><span>Cintura (cm)</span>
+          <input id="med-cintura" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 82"></label>
       </div>
-      <div id="peso-lista"></div>
+      <button class="boton" id="med-guardar">Guardar</button>
+      <div class="nota">La cintura se mide a la altura del ombligo, de pie y sin apretar.</div>
     </div>
+
+    <div class="tarjeta" id="tarjeta-imc">
+      <div class="titulo">⚖️ IMC e índice de cintura</div>
+      <div id="resumen-imc"></div>
+    </div>
+
+    <div class="tarjeta">
+      <div class="titulo">📈 Evolución</div>
+      <div class="chips" id="chips-grafico" style="margin-bottom:12px"></div>
+      <svg class="grafico" id="grafico" viewBox="0 0 320 180"></svg>
+      <div id="lista-medidas"></div>
+    </div>
+
     <div class="tarjeta">
       <div class="titulo">🍽️ Últimos 7 días</div>
       <div class="barras" id="barras"></div>
@@ -113,12 +127,12 @@
   <!-- ============ AJUSTES ============ -->
   <section id="vista-ajustes" class="oculto">
     <div class="tarjeta">
-      <div class="titulo">🎯 Objetivo diario</div>
-      <label class="campo"><span>Calorías al día</span>
+      <div class="titulo">🎯 Tope de calorías al día</div>
+      <label class="campo"><span>Calorías</span>
         <input id="aj-objetivo" type="number" inputmode="numeric" min="800" max="5000" step="10">
       </label>
-      <button class="boton gris" id="aj-calcular">Calcular un objetivo para mí</button>
-      <div class="nota">Es una estimación orientativa. Si hay alguna enfermedad de por medio o quieres bajar bastante peso, que lo revise el médico.</div>
+      <button class="boton gris" id="aj-calcular">Calcular un tope para mí</button>
+      <div class="nota">Es una estimación orientativa. Si hay alguna enfermedad de por medio o quiere bajar bastante peso, que lo revise el médico.</div>
     </div>
 
     <div class="tarjeta">
@@ -129,7 +143,7 @@
       <div id="horas-avisos">
         <div class="fila">
           <label class="campo"><span>Desayuno</span><input id="aj-hora-desayuno" type="time"></label>
-          <label class="campo"><span>Comida</span><input id="aj-hora-comida" type="time"></label>
+          <label class="campo"><span>Almuerzo</span><input id="aj-hora-comida" type="time"></label>
         </div>
         <div class="fila">
           <label class="campo"><span>Cena</span><input id="aj-hora-cena" type="time"></label>
@@ -168,14 +182,20 @@
           <option value="-500">Bajar más rápido</option>
         </select>
       </label>
-      <label class="campo"><span>Vasos de agua al día</span>
-        <input id="aj-agua" type="number" inputmode="numeric" min="4" max="12">
-      </label>
+      <div class="fila">
+        <label class="campo"><span>Vasos de agua al día</span>
+          <input id="aj-agua" type="number" inputmode="numeric" min="4" max="12"></label>
+        <label class="campo"><span>Personas por receta</span>
+          <input id="aj-porciones" type="number" inputmode="numeric" min="1" max="8"></label>
+      </div>
+      <div class="interruptor"><b>Recetas sin carne ni pescado</b>
+        <button class="palanca" id="aj-vegetariano" aria-label="Vegetariano"></button>
+      </div>
     </div>
 
     <div class="tarjeta">
       <div class="titulo">💾 Copia de seguridad</div>
-      <div class="nota" style="margin:0 0 12px">Los datos se guardan solo en este teléfono. Si cambia de móvil, copie el texto y péguelo en el nuevo.</div>
+      <div class="nota" style="margin:0 0 12px">Todo se guarda solo en este teléfono. Si cambia de móvil, copie el texto y péguelo en el nuevo.</div>
       <button class="boton gris" id="aj-exportar">Copiar mis datos</button>
       <button class="boton gris" id="aj-importar">Pegar datos de otro móvil</button>
       <button class="boton roja" id="aj-borrar">Borrar todo y empezar de cero</button>
@@ -186,6 +206,7 @@
 
 <nav>
   <button data-vista="hoy" class="activa"><span class="i">🍽️</span>Hoy</button>
+  <button data-vista="recetas"><span class="i">🥗</span>Recetas</button>
   <button data-vista="progreso"><span class="i">📈</span>Progreso</button>
   <button data-vista="logros"><span class="i">🏅</span>Logros</button>
   <button data-vista="ajustes"><span class="i">⚙️</span>Ajustes</button>
@@ -195,6 +216,9 @@
 <div id="celebracion"></div>
 
 <script src="alimentos.js"></script>
+<script src="ingredientes.js"></script>
+<script src="recetas.js"></script>
+<script src="motor.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
