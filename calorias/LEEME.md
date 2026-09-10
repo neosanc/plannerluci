@@ -39,8 +39,10 @@ picoteo). Cada comida tiene un **título automático** con lo que lleva y un bot
 algo, aparece **«Repetir el de ayer»**.
 
 Al añadir un alimento, la pantalla se abre en los **habituales de esa comida** y arriba
-hay pestañas por tipo (frutas, verduras, proteínas, lácteos, legumbres, cereales,
-grasas, condimentos, bebidas y dulces), más ⭐ favoritos y la lista ampliada. Las
+hay pestañas: ⭐ favoritos, **🛒 sus productos** (los 26 del catálogo que mandó, con marca
+y la porción del envase), **✎ los suyos** (los que ella cree), los tipos (frutas,
+verduras, proteínas, lácteos, legumbres, cereales, grasas, condimentos, bebidas y
+dulces) y la lista ampliada. Las
 cantidades se ponen en **unidades, gramos, cucharadas, cucharaditas, tazas o pizcas**,
 con botones de − y +. El **＋** de cada fila lo añade de una vez con la medida habitual.
 
@@ -67,6 +69,7 @@ receta, recetas sin carne y copia de seguridad.
 | `estilos.css` | Colores, gradientes y disposición |
 | `app.js` | Comidas, agua, racha, medallas, medidas, recetas y avisos |
 | `nutricion.js` | 111 alimentos habituales con macros y micros completos |
+| `productos.js` | Los 26 productos del catálogo de Gema, sacados de sus etiquetas |
 | `alimentos.js` | 240 alimentos más, solo con calorías (incluidos 42 chilenos) |
 | `ingredientes.js` | 72 ingredientes con producto chileno sugerido |
 | `recetas.js` | 28 recetas escritas a mano |
@@ -82,6 +85,17 @@ por porción. El proyecto Android que envuelve todo esto está en `../app-androi
 En el propio teléfono: los datos en `localStorage` y las fotos en `IndexedDB`. Si se borran los datos de la app o se cambia de
 móvil se pierden, salvo que se use **Ajustes → Copiar mis datos** y luego **Pegar datos
 de otro móvil**.
+
+## Crear sus propios alimentos
+
+En la pestaña **✎ Los suyos** hay un botón para **crear un alimento nuevo**: nombre,
+marca, tipo, en qué comidas lo toma, cuánto pesa su porción y lo que diga la etiqueta
+(calorías, proteínas, carbohidratos, grasa y, si vienen, fibra, sodio, calcio, hierro,
+potasio y vitamina C). Los números se pueden escribir **por porción o por 100 g**, que la
+app hace la cuenta. Lo que se deje en blanco queda como «la etiqueta no lo dice» y **no
+se cuenta como cero**: en la tarjeta de micros aparece un aviso de cuántos alimentos del
+día vienen con datos a medias. Esos alimentos se pueden editar y borrar después, y se
+comportan igual que los demás: se buscan, se marcan como favoritos y se añaden con el ＋.
 
 ## Sobre los números
 

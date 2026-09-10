@@ -40,7 +40,7 @@ const porDefecto = () => ({
   perfil: {nombre:"", objetivo:1500, sexo:"m", edad:55, altura:160, peso:70,
            actividad:"1.375", plan:"0", vasos:8, porciones:2, vegetariano:false, racion:10},
   avisos: {activos:false, desayuno:"09:00", comida:"14:00", cena:"21:00", agua:"12:00"},
-  dias: {}, agua: {}, medidas: [], propios: [], recientes: [], favoritos: [],
+  dias: {}, agua: {}, medidas: [], propios: [], mios: {}, recientes: [], favoritos: [],
   logros: {}, guardadas: []
 });
 
@@ -131,10 +131,20 @@ function aviso(texto, accion){
 /* 1) HABITUALES: con macros y micros completos, medidas en unidades/g/cda/cdta
    2) ALIMENTOS: la lista larga de siempre, solo con calorías */
 
+/* los productos del catálogo de Gema se suman a los habituales */
+if(typeof PRODUCTOS === "object"){
+  Object.keys(PRODUCTOS).forEach(k => { HABITUALES[k] = PRODUCTOS[k]; });
+}
+
 function habitual(id){
   const h = HABITUALES[id];
   if(!h) return null;
   return Object.assign({clave:"h:" + id, id, hab:true}, h);
+}
+function mio(id){
+  const m = datos.mios && datos.mios[id];
+  if(!m) return null;
+  return Object.assign({clave:"m:" + id, id, hab:true, mio:true}, m);
 }
 function antiguo(nombre){
   const a = datos.propios.concat(ALIMENTOS).find(x => x.n === nombre);
@@ -142,17 +152,22 @@ function antiguo(nombre){
   return Object.assign({clave:"a:" + nombre, hab:false}, a);
 }
 function porClave(clave){
-  return clave.slice(0,2) === "h:" ? habitual(clave.slice(2)) : antiguo(clave.slice(2));
+  const tipo = clave.slice(0,2);
+  if(tipo === "h:") return habitual(clave.slice(2));
+  if(tipo === "m:") return mio(clave.slice(2));
+  return antiguo(clave.slice(2));
 }
 
 function gramosDe(a, unidad, cantidad){
   if(unidad === "g" || unidad === "ml") return cantidad;
   return cantidad * (a.gr[unidad] || 1);
 }
+const NUTRIENTES = ["prot","carb","gras","fib","na","ca","fe","k","vc"];
+
 function nutrientesDe(a, gramos){
-  const f = gramos / 100;
-  return {kcal: a.kcal*f, prot: a.prot*f, carb: a.carb*f, gras: a.gras*f, fib: a.fib*f,
-          na: a.na*f, ca: a.ca*f, fe: a.fe*f, k: a.k*f, vc: a.vc*f};
+  const f = gramos / 100, r = {};
+  NUTRIENTES.forEach(x => { if(typeof a[x] === "number") r[x] = a[x]*f; });
+  return r;
 }
 function textoCantidad(unidad, cantidad){
   const fr = {0.25:"¼", 0.5:"½", 0.75:"¾", 1.5:"1½", 2.5:"2½"};
@@ -160,7 +175,8 @@ function textoCantidad(unidad, cantidad){
   const plural = cantidad > 1;
   const nombres = {unidad: plural?"unidades":"unidad", cda: plural?"cdas":"cda",
                    cdta: plural?"cdtas":"cdta", taza: plural?"tazas":"taza",
-                   pizca: plural?"pizcas":"pizca", g:"g", ml:"ml"};
+                   pizca: plural?"pizcas":"pizca", porcion: plural?"porciones":"porción",
+                   g:"g", ml:"ml"};
   return (unidad === "g" || unidad === "ml") ? Math.round(cantidad) + " " + unidad
                                              : n + " " + (nombres[unidad] || unidad);
 }
@@ -168,17 +184,14 @@ function textoCantidad(unidad, cantidad){
 /* ---------------- totales del día ---------------- */
 
 function totalesDia(f){
-  const t = {kcal:0, prot:0, carb:0, gras:0, fib:0, na:0, ca:0, fe:0, k:0, vc:0, incompletos:0};
+  const t = {kcal:0, prot:0, carb:0, gras:0, fib:0, na:0, ca:0, fe:0, k:0, vc:0,
+             incompletos:0, parciales:0};
   COMIDAS.forEach(([id]) => entradas(f, id).forEach(e => {
     t.kcal += e.kcal;
-    if(e.nut){
-      ["prot","carb","gras","fib","na","ca","fe","k","vc"].forEach(x => {
-        if(typeof e.nut[x] === "number") t[x] += e.nut[x];
-      });
-      if(typeof e.nut.carb !== "number") t.incompletos++;
-    }else{
-      t.incompletos++;
-    }
+    if(!e.nut) return t.incompletos++;
+    NUTRIENTES.forEach(x => { if(typeof e.nut[x] === "number") t[x] += e.nut[x]; });
+    if(typeof e.nut.carb !== "number") t.incompletos++;
+    else if(NUTRIENTES.some(x => typeof e.nut[x] !== "number")) t.parciales++;
   }));
   return t;
 }
@@ -416,10 +429,13 @@ function pintarMicros(t){
         '" style="width:' + Math.min(100, pct) + '%"></i></div>' +
     '</div>';
   }).join("");
-  const t2 = totalesDia(fechaActual);
-  $("#nota-micros").textContent = t2.incompletos
-    ? "Los porcentajes son sobre lo recomendado al día. Faltan los datos de " + t2.incompletos +
-      (t2.incompletos === 1 ? " alimento" : " alimentos") + " (recetas o de la lista ampliada)."
+  const avisos = [];
+  if(t.incompletos) avisos.push(t.incompletos + (t.incompletos === 1
+    ? " alimento va sin macros" : " alimentos van sin macros"));
+  if(t.parciales) avisos.push("en " + t.parciales + (t.parciales === 1
+    ? " la etiqueta no trae todos los micros" : " las etiquetas no traen todos los micros"));
+  $("#nota-micros").textContent = avisos.length
+    ? "Porcentajes sobre lo recomendado al día. Ojo: " + avisos.join(" y ") + "."
     : "Los porcentajes son sobre lo recomendado al día para una mujer adulta. El sodio es un tope, no una meta.";
 }
 
@@ -506,7 +522,8 @@ function abrirBuscador(comida){
 }
 
 function pintarChipsAlimentos(){
-  const chips = [["habituales", "🍽️ Habituales"], ["favoritos", "⭐ Favoritos"]]
+  const chips = [["habituales", "🍽️ Habituales"], ["favoritos", "⭐ Favoritos"],
+                 ["productos", "🛒 Sus productos"], ["mios", "✎ Los suyos"]]
     .concat(CATEGORIAS_HAB.map(([id, n, e]) => [id, e + " " + n]))
     .concat([["mas", "🔎 Lista ampliada"]]);
   $("#chips-alimentos").innerHTML = chips.map(([id, n]) =>
@@ -520,7 +537,9 @@ function listar(texto){
 
   if(q){
     const hab = Object.keys(HABITUALES).filter(id => sinTildes(HABITUALES[id].n).includes(q))
-      .map(habitual);
+      .map(habitual)
+      .concat(Object.keys(datos.mios || {})
+        .filter(id => sinTildes(datos.mios[id].n).includes(q)).map(mio));
     const otros = datos.propios.concat(ALIMENTOS)
       .filter(a => sinTildes(a.n).includes(q))
       .filter(a => !hab.some(h => sinTildes(h.n) === sinTildes(a.n)))
@@ -540,6 +559,17 @@ function listar(texto){
       ? '<div class="grupo">⭐ Sus favoritos</div>' + favs.map(fila).join("")
       : '<div class="vacio"><span class="em">⭐</span>Marque la estrella de un alimento y aparecerá aquí.</div>';
     html += botonNuevo();
+  }else if(pestanaAlimentos === "productos"){
+    const lista = Object.keys(HABITUALES).filter(id => HABITUALES[id].prod).map(habitual);
+    html = '<div class="grupo">🛒 Del catálogo que mandó</div>' + lista.map(fila).join("") + botonNuevo();
+  }else if(pestanaAlimentos === "mios"){
+    const lista = Object.keys(datos.mios || {}).map(mio).filter(Boolean);
+    html = '<div class="item"><button class="principal" data-crear-alimento>' +
+      '<span class="nom"><b>➕ Crear un alimento nuevo</b>' +
+      '<span>Con sus calorías, macros y lo que traiga la etiqueta</span></span></button></div>';
+    html += lista.length
+      ? '<div class="grupo">✎ Los alimentos que ha creado</div>' + lista.map(fila).join("")
+      : '<div class="vacio">Todavía no ha creado ninguno.</div>';
   }else if(pestanaAlimentos === "mas"){
     const recientes = datos.recientes.map(porClave).filter(Boolean).slice(0, 5);
     if(recientes.length) html += '<div class="grupo">🕒 Lo último que usó</div>' + recientes.map(fila).join("");
@@ -558,7 +588,8 @@ function listar(texto){
 
 function botonNuevo(){
   return '<div class="item"><button class="principal" data-nuevo>' +
-    '<span class="nom"><b>✎ Otro alimento</b><span>Apuntarlo a mano con sus calorías</span></span></button></div>';
+    '<span class="nom"><b>✎ Otro alimento, solo calorías</b>' +
+    '<span>Para algo de una vez. Si lo va a repetir, mejor créelo en «Los suyos»</span></span></button></div>';
 }
 
 function fila(a){
@@ -567,7 +598,9 @@ function fila(a){
   if(a.hab){
     const g = gramosDe(a, a.def.u, a.def.c);
     kcal = Math.round(a.kcal * g / 100);
-    detalle = textoCantidad(a.def.u, a.def.c) + (a.def.u === "g" || a.def.u === "ml" ? "" : " · " + Math.round(g) + " g");
+    detalle = a.medida
+      ? (a.marca ? a.marca + " · " : "") + a.medida
+      : textoCantidad(a.def.u, a.def.c) + (a.def.u === "g" || a.def.u === "ml" ? "" : " · " + Math.round(g) + " g");
   }else{
     const p = a.p[0];
     kcal = Math.round(a.k * p[1] / 100);
@@ -579,8 +612,10 @@ function fila(a){
       '<span class="val">' + kcal + ' kcal</span>' +
     '</button>' +
     '<button class="rapido" data-rapido="' + esc(a.clave) + '" aria-label="Añadir">＋</button>' +
-    '<button class="estrella' + (favorito ? " si" : "") + '" data-favorito="' + esc(a.clave) + '" ' +
-      'aria-label="Favorito">⭐</button>' +
+    (a.mio
+      ? '<button class="estrella si" data-editar-alimento="' + esc(a.id) + '" aria-label="Editar">✎</button>'
+      : '<button class="estrella' + (favorito ? " si" : "") + '" data-favorito="' + esc(a.clave) + '" ' +
+        'aria-label="Favorito">⭐</button>') +
   '</div>';
 }
 
@@ -653,7 +688,7 @@ function pintarCantidad(){
 
 function nombreUnidad(u){
   return {unidad:"unidades", g:"gramos", ml:"mililitros", cda:"cucharadas",
-          cdta:"cucharaditas", taza:"tazas", pizca:"pizcas"}[u] || u;
+          cdta:"cucharaditas", taza:"tazas", pizca:"pizcas", porcion:"porciones"}[u] || u;
 }
 function refrescarResumen(){
   const a = elegido;
@@ -728,6 +763,121 @@ function guardarNuevo(){
   guardar();
   anotar("a:" + nombre, "g", 100, comidaDestino);
   cerrarHoja();
+}
+
+/* ---------------- crear y editar sus propios alimentos ---------------- */
+
+let comidasDelAlimento = [];
+
+function abrirEditorAlimento(id){
+  const m = id ? datos.mios[id] : null;
+  comidasDelAlimento = m ? (m.com || []).slice() : [];
+  const v = (x, d) => (m && typeof m[x] === "number") ? coma(redondo(m[x], 2)) : (d || "");
+  const campo = (id2, etiqueta, valor, extra) =>
+    '<label class="campo"><span>' + etiqueta + '</span>' +
+    '<input id="' + id2 + '" type="' + (extra || "text") + '" inputmode="' +
+    (extra ? "decimal" : "text") + '" value="' + esc(valor || "") + '"></label>';
+
+  $("#hoja").innerHTML =
+  '<div class="hoja">' +
+    '<div class="hoja-cab"><b>' + (m ? "Editar alimento" : "Alimento nuevo") + '</b>' +
+      '<button class="cerrar" data-cerrar>Cerrar</button></div>' +
+    '<div class="hoja-cuerpo">' +
+      '<div class="tarjeta">' +
+        '<div class="titulo">Qué es</div>' +
+        campo("ali-nombre", "Nombre", m ? m.n : "") +
+        campo("ali-marca", "Marca (si tiene)", m ? m.marca : "") +
+        '<label class="campo"><span>Tipo</span><select id="ali-cat">' +
+          CATEGORIAS_HAB.map(([c, n, e]) =>
+            '<option value="' + c + '"' + (m && m.cat === c ? " selected" : "") + '>' + e + " " + n + '</option>').join("") +
+        '</select></label>' +
+        '<div class="titulo" style="margin-top:8px">En qué comidas la toma</div>' +
+        '<div class="chips" id="ali-comidas">' + COMIDAS.slice(0,4).map(([c, n, e]) =>
+          '<button class="chip' + (comidasDelAlimento.includes(c) ? " sel" : "") +
+          '" data-ali-comida="' + c + '">' + e + " " + n + '</button>').join("") + '</div>' +
+      '</div>' +
+
+      '<div class="tarjeta">' +
+        '<div class="titulo">La porción del envase</div>' +
+        '<div class="fila">' +
+          campo("ali-medida", "Cómo se llama", m ? (m.medida || "1 porción") : "1 porción") +
+          campo("ali-gramos", "Cuánto pesa (g)", m ? String(m.gr.porcion).replace(".", ",") : "", "text") +
+        '</div>' +
+        '<label class="campo"><span>Los números que voy a escribir son…</span>' +
+          '<select id="ali-base">' +
+            '<option value="100">por cada 100 g o 100 ml</option>' +
+            '<option value="porcion">por una porción</option>' +
+          '</select></label>' +
+      '</div>' +
+
+      '<div class="tarjeta">' +
+        '<div class="titulo">Lo que dice la etiqueta</div>' +
+        '<div class="fila">' + campo("ali-kcal", "Calorías (kcal)", v("kcal"), "text") +
+          campo("ali-prot", "Proteínas (g)", v("prot"), "text") + '</div>' +
+        '<div class="fila">' + campo("ali-carb", "Carbohidratos (g)", v("carb"), "text") +
+          campo("ali-gras", "Grasa (g)", v("gras"), "text") + '</div>' +
+        '<div class="fila">' + campo("ali-fib", "Fibra (g)", v("fib"), "text") +
+          campo("ali-na", "Sodio (mg)", v("na"), "text") + '</div>' +
+        '<div class="fila">' + campo("ali-ca", "Calcio (mg)", v("ca"), "text") +
+          campo("ali-fe", "Hierro (mg)", v("fe"), "text") + '</div>' +
+        '<div class="fila">' + campo("ali-k", "Potasio (mg)", v("k"), "text") +
+          campo("ali-vc", "Vitamina C (mg)", v("vc"), "text") + '</div>' +
+        '<div class="nota">Solo hacen falta el nombre, el peso de la porción y las calorías. ' +
+        'Lo que deje en blanco se queda como «no lo dice la etiqueta» y no se cuenta como cero.</div>' +
+      '</div>' +
+
+      '<button class="boton" data-guardar-alimento="' + esc(id || "") + '">Guardar</button>' +
+      (m ? '<button class="boton roja" data-borrar-alimento="' + esc(id) + '">Borrar este alimento</button>' : "") +
+    '</div>' +
+  '</div>';
+}
+
+function volverAlBuscador(pestana){
+  abrirBuscador(comidaDestino);
+  pestanaAlimentos = pestana;
+  pintarChipsAlimentos();
+  listar("");
+}
+
+function guardarAlimentoMio(id){
+  const nombre = $("#ali-nombre").value.trim();
+  const gramos = num($("#ali-gramos").value);
+  const kcal = num($("#ali-kcal").value);
+  if(!nombre) return aviso("Falta el nombre");
+  if(!(gramos > 0)) return aviso("Falta cuánto pesa la porción");
+  if(!(kcal >= 0)) return aviso("Faltan las calorías");
+
+  const porPorcion = $("#ali-base").value === "porcion";
+  const aCien = valor => {
+    if(typeof valor !== "number" || isNaN(valor)) return null;
+    return porPorcion ? redondo(valor / gramos * 100, 2) : valor;
+  };
+  const leer = campo => {
+    const t = $("#ali-" + campo).value.trim();
+    return t === "" ? null : aCien(num(t));
+  };
+  const clave = id || ("mio" + Date.now().toString(36));
+  const medida = $("#ali-medida").value.trim() || "1 porción";
+  datos.mios[clave] = {
+    n: nombre, marca: $("#ali-marca").value.trim(), cat: $("#ali-cat").value, mio: true,
+    medida: medida + " (" + Math.round(gramos) + " g)",
+    u: ["porcion","g"], gr: {porcion: gramos}, def: {u:"porcion", c:1},
+    com: comidasDelAlimento.slice(),
+    kcal: aCien(kcal), prot: leer("prot"), carb: leer("carb"), gras: leer("gras"),
+    fib: leer("fib"), na: leer("na"), ca: leer("ca"), fe: leer("fe"), k: leer("k"), vc: leer("vc")
+  };
+  guardar();
+  volverAlBuscador("mios");
+  aviso(id ? "Alimento actualizado" : "Alimento creado");
+}
+
+function borrarAlimentoMio(id){
+  if(!confirm("¿Borrar este alimento? Lo ya apuntado no se toca.")) return;
+  delete datos.mios[id];
+  datos.favoritos = datos.favoritos.filter(c => c !== "m:" + id);
+  guardar();
+  volverAlBuscador("mios");
+  aviso("Alimento borrado");
 }
 
 /* ---------------- menú de la semana ---------------- */
@@ -1281,6 +1431,17 @@ document.addEventListener("click", ev => {
     return;
   }
   if(t.dataset.abrirAlimento) return abrirCantidad(t.dataset.abrirAlimento);
+  if(t.hasAttribute("data-crear-alimento")) return abrirEditorAlimento(null);
+  if(t.dataset.editarAlimento) return abrirEditorAlimento(t.dataset.editarAlimento);
+  if(t.dataset.aliComida){
+    const c = t.dataset.aliComida;
+    comidasDelAlimento = comidasDelAlimento.includes(c)
+      ? comidasDelAlimento.filter(x => x !== c) : comidasDelAlimento.concat([c]);
+    t.classList.toggle("sel");
+    return;
+  }
+  if(t.hasAttribute("data-guardar-alimento")) return guardarAlimentoMio(t.dataset.guardarAlimento || null);
+  if(t.dataset.borrarAlimento) return borrarAlimentoMio(t.dataset.borrarAlimento);
   if(t.dataset.unidad){
     if(unidadElegida !== t.dataset.unidad){
       const gramos = gramosDe(elegido, unidadElegida, cantidadElegida);
